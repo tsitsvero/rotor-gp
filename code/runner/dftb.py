@@ -85,6 +85,7 @@ class Dftb(FileIOCalculator):
             An external point charge potential (for QM/MM calculations)
         """
 
+
         if slako_dir is None:
             slako_dir = os.environ.get('DFTB_PREFIX', './')
             if not slako_dir.endswith('/'):

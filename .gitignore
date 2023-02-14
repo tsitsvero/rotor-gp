@@ -128,3 +128,14 @@ dmypy.json
 # Pyre type checker
 .pyre/
 data/structures/*
+
+code/band.out
+code/crystal.out
+code/detailed.out
+code/dftb_in.hsd
+code/dftb_pin.hsd
+code/geo_end.gen
+results/test/
+
+code/bck.*.HILLS
+code/HILLS
