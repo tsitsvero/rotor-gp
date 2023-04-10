@@ -141,3 +141,4 @@ code/bck.*.HILLS
 code/HILLS
 code/lightning_logs/*
 code/wandb/
+results/outdir/
