@@ -9,7 +9,7 @@
     <port>10200</port>
   </ffsocket>
   <system>
-    <initialize nbeads='1'>
+    <initialize nbeads='5'>
       <file mode='ase'>  ktu_002.cif </file>
     </initialize>
     <forces>
