@@ -8,12 +8,13 @@
 
 # Tutorial:
 # https://gitlab.com/Sucerquia/ase-plumed_tutorial
+# https://dftbplus-recipes.readthedocs.io/en/latest/interfaces/ipi/ipi.html
 
 
 import os
 import sys
 
-from ase.calculators.socketio import SocketClient
+from ase.calculators.socketio import SocketClient, SocketIOCalculator
 from ase.io import read
 from ase import units
 
@@ -86,3 +87,12 @@ host = "localhost"
 client = SocketClient(host=host, port=port)
 
 client.run(atoms)
+
+print("Finished running!")
+
+# # ################# Create ASE SERVER ############################
+# https://github.com/i-pi/i-pi/blob/master/examples/ASEClient/aims_double_server/run-ase.py
+
+# with SocketIOCalculator(calc_base, log="socketio.log", port=port) as io_calc:
+#     atoms.set_calculator(io_calc)
+#     client.run(atoms)
