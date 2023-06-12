@@ -154,9 +154,11 @@ code/pimd/*RESTART*
 code/pimd/*log*
 code/pimd/*HILLS*
 
-ktu_002.cif
+ktu_002.*
 
 code/pimd/*.out
 code/pimd/geo_end.gen
 code/pimd/dftb_in.hsd
 code/pimd/dftb_pin.hsd
+
+code/pimd/results.tag

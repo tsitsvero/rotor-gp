@@ -5,18 +5,18 @@
     <properties stride="2"> [ step, time, conserved, temperature{kelvin}, kinetic_cv, 
             potential, kinetic_cv(H), kinetic_cv(O), ensemble_bias ] </properties>
   </output>
-  <total_steps> 600 </total_steps>
-  <ffsocket mode='inet' name='mycalc' pbc='False'>
+  <total_steps> 100 </total_steps>
+  <ffsocket mode='inet' name='mycalc' pbc='True'>
     <address>localhost</address>
     <port>10200</port>
   </ffsocket>
-  <ffplumed name="plumed" pbc='False'>
-         <file mode="xyz">./init.xyz</file>
-         <plumeddat> plumed/plumed.dat </plumeddat>
+  <ffplumed name="plumed" pbc='True'>
+         <file mode="xyz"> ../../../structures/structures/new_systems/ktu_002.xyz</file>
+        <plumeddat> plumed/plumed.dat </plumeddat>
   </ffplumed>
   <system>
     <initialize nbeads='5'>
-      <file mode='xyz'>  init.xyz </file>
+            <file mode='xyz'>  ../../../structures/structures/new_systems/ktu_002.xyz </file>
     </initialize>
     <forces>
       <force forcefield='mycalc'> </force>
