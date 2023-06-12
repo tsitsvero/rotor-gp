@@ -1,0 +1,30 @@
+<simulation verbosity='high'>
+  <output prefix='PREFIX'>
+<!--    <properties stride='1' filename='out'>  [ step, potential{kilocal/mol} ] </properties>-->
+    <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory>
+  </output>
+  <total_steps> 100 </total_steps>
+  <ffsocket mode='inet' name='mycalc' pbc='False'>
+    <address>localhost</address>
+    <port>10200</port>
+  </ffsocket>
+  <system>
+    <initialize nbeads='1'>
+      <file mode='xyz'>  init.xyz </file>
+    </initialize>
+    <forces>
+      <force forcefield='mycalc'> </force>
+    </forces>
+    <ensemble>
+      <temperature units='kelvin'> 300.0 </temperature>
+    </ensemble>
+    <motion mode='dynamics'>
+      <dynamics mode='nvt'>
+        <timestep units='femtosecond'> 0.25 </timestep>
+        <thermostat mode='langevin'>
+          <tau units='femtosecond'>100</tau>
+        </thermostat>
+      </dynamics>
+    </motion>
+  </system>
+</simulation>
