@@ -10,7 +10,7 @@
   </ffsocket>
   <system>
     <initialize nbeads='1'>
-      <file mode='xyz'>  init.xyz </file>
+      <file mode='ase'>  ktu_002.cif </file>
     </initialize>
     <forces>
       <force forcefield='mycalc'> </force>
