@@ -25,7 +25,10 @@ from ase.calculators.dftb import Dftb
 
 # Define atoms object
 # atoms = read("init.xyz", index='0', format='extxyz')
-atoms = read('ktu_002.cif')
+# atoms = read(' ../../../structures/structures/new_systems/ktu_002.xyz')
+atoms = read('/home/dlbox2/repos/structures/structures/new_systems/ktu_002.cif')
+
+
 
 
 # # from plumed import Plumed
