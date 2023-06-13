@@ -5,7 +5,7 @@
     <properties stride="2"> [ step, time, conserved, temperature{kelvin}, kinetic_cv, 
             potential, kinetic_cv(H), kinetic_cv(O), ensemble_bias ] </properties>
   </output>
-  <total_steps> 1000 </total_steps>
+  <total_steps> 10 </total_steps>
   <ffsocket mode='inet' name='mycalc' pbc='True'>
     <address>localhost</address>
     <port>10200</port>
@@ -15,7 +15,7 @@
         <plumeddat> plumed/plumed.dat </plumeddat>
   </ffplumed>
   <system>
-    <initialize nbeads='10'>
+    <initialize nbeads='5'>
             <file mode='xyz'>  ../../../structures/structures/new_systems/ktu_002.xyz </file>
     </initialize>
     <forces>

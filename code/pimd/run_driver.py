@@ -60,12 +60,12 @@ calc_base = Dftb(atoms=atoms,
             label='crystal',
             # Hamiltonian_ = "xTB",
             # Hamiltonian_Method = "GFN1-xTB",
-            # Hamiltonian_MaxAngularMomentum_='',
-            # Hamiltonian_MaxAngularMomentum_O='p',
-            # Hamiltonian_MaxAngularMomentum_H='s',
-            # Hamiltonian_MaxAngularMomentum_N='s',
-            # Hamiltonian_MaxAngularMomentum_C='s',
-            # Hamiltonian_MaxAngularMomentum_Si='s',
+            Hamiltonian_MaxAngularMomentum_='',
+            Hamiltonian_MaxAngularMomentum_O='p',
+            Hamiltonian_MaxAngularMomentum_H='s',
+            Hamiltonian_MaxAngularMomentum_N='s',
+            Hamiltonian_MaxAngularMomentum_C='s',
+            Hamiltonian_MaxAngularMomentum_Si='s',
             kpts=(1,1,1),
             # Hamiltonian_SCC='Yes',
             # Verbosity=0,
@@ -76,10 +76,10 @@ calc_base = Dftb(atoms=atoms,
             # Driver_MaxForceComponent=1e-3,
             # Driver_MaxSteps=200,
             # Driver_LatticeOpt = 'Yes',
-            # Driver_AppendGeometries = 'Yes'
-            Driver_='',
-            Driver_Socket_='',
-            Driver_Socket_File='Hello'
+        #     Driver_AppendGeometries = 'Yes',
+        #     Driver_='',
+        #     Driver_Socket_='',
+        #     Driver_Socket_File='Hello'
             )
 
 # atoms.set_calculator(calc_base)
@@ -92,12 +92,12 @@ port = 10200
 host = "localhost"
 client = SocketClient(host=host, port=port)
 
-# client.run(atoms)
+client.run(atoms)
 
 
-with SocketIOCalculator(calc_base, log=sys.stdout, unixsocket='Hello') as calc:
-        atoms.set_calculator(calc)
-        client.run(atoms)
+# with SocketIOCalculator(calc_base, log=sys.stdout, unixsocket='Hello') as calc:
+#         atoms.set_calculator(calc)
+#         client.run(atoms)
 
 print("Finished running!")
 
