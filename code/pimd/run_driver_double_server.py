@@ -27,6 +27,7 @@ from ase.calculators.dftb import Dftb
 # atoms = read("init.xyz", index='0', format='extxyz')
 # atoms = read(' ../../../structures/structures/new_systems/ktu_002.xyz')
 atoms = read('/home/dlbox2/repos/structures/structures/new_systems/ktu_002.cif')
+# print(atoms.get_chemical_symbols())
 
 
 
@@ -54,18 +55,18 @@ atoms = read('/home/dlbox2/repos/structures/structures/new_systems/ktu_002.cif')
 
 import os
 os.environ['OMP_NUM_THREADS'] = "6,1"
-os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; dftb+ > PREFIX.out"
+os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; /home/dlbox2/anaconda3/envs/fande/bin/dftb+ > PREFIX.out"
 os.environ["DFTB_PREFIX"] = "./pbc-0-3"
 calc_base = Dftb(atoms=atoms,
             label='crystal',
             # Hamiltonian_ = "xTB",
             # Hamiltonian_Method = "GFN1-xTB",
-            # Hamiltonian_MaxAngularMomentum_='',
-            # Hamiltonian_MaxAngularMomentum_O='p',
-            # Hamiltonian_MaxAngularMomentum_H='s',
-            # Hamiltonian_MaxAngularMomentum_N='s',
-            # Hamiltonian_MaxAngularMomentum_C='s',
-            # Hamiltonian_MaxAngularMomentum_Si='s',
+            Hamiltonian_MaxAngularMomentum_='',
+            Hamiltonian_MaxAngularMomentum_O='p',
+            Hamiltonian_MaxAngularMomentum_H='s',
+            Hamiltonian_MaxAngularMomentum_N='s',
+            Hamiltonian_MaxAngularMomentum_C='s',
+            Hamiltonian_MaxAngularMomentum_Si='s',
             kpts=(1,1,1),
             # Hamiltonian_SCC='Yes',
             # Verbosity=0,
@@ -103,6 +104,7 @@ print("Finished running!")
 
 # # ################# Create ASE SERVER ############################
 # https://github.com/i-pi/i-pi/blob/master/examples/ASEClient/aims_double_server/run-ase.py
+# https://databases.fysik.dtu.dk/ase/ase/calculators/socketio/socketio.html
 
 # with SocketIOCalculator(calc_base, log="socketio.log", port=port) as io_calc:
 #     atoms.set_calculator(io_calc)
