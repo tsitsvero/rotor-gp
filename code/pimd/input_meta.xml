@@ -5,7 +5,7 @@
     <properties stride="2"> [ step, time, conserved, temperature{kelvin}, kinetic_cv, 
             potential, kinetic_cv(H), kinetic_cv(O), ensemble_bias ] </properties>
   </output>
-  <total_steps> 10 </total_steps>
+  <total_steps> 1000 </total_steps>
   <ffsocket mode='inet' name='mycalc' pbc='True'>
     <address>localhost</address>
     <port>10200</port>
@@ -17,6 +17,7 @@
   <system>
     <initialize nbeads='5'>
             <file mode='xyz'>  ../../../structures/structures/new_systems/ktu_002.xyz </file>
+            <velocities mode="thermal" units="kelvin"> 20 </velocities>
     </initialize>
     <forces>
       <force forcefield='mycalc'> </force>
@@ -24,7 +25,7 @@
     <ensemble>
       <temperature units='kelvin'> 300.0 </temperature>
       <bias>
-        <force forcefield="plumed" nbeads="1"></force>
+        <force forcefield="plumed" nbeads="2"></force>
       </bias>
     </ensemble>
     <motion mode='dynamics'>
