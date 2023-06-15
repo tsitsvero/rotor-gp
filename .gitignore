@@ -162,4 +162,5 @@ code/pimd/dftb_in.hsd
 code/pimd/dftb_pin.hsd
 
 code/pimd/results.tag
-dftb.out
+
+code/pimd/temp_calc_dir_*/*
