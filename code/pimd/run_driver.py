@@ -4,7 +4,7 @@
 # i-pi input.xml > log || python ./run_driver.py
 
 # To clean up: 
-# rm -rf *log* *PREFIX*  *RESTART* *COLVAR* plumed/*COLVAR* plumed/*HILLS* *HILLS* *colvar* temp_calc_dir_*
+# rm -rf *log* *PREFIX*  *RESTART* *COLVAR* plumed/*COLVAR* plumed/*HILLS* *HILLS* *colvar* temp_calc_dir_* EXIT
 
 # Tutorial:
 # https://gitlab.com/Sucerquia/ase-plumed_tutorial
