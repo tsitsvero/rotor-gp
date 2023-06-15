@@ -41,7 +41,7 @@ atoms = read('/home/dlbox2/repos/structures/structures/new_systems/ktu_002.cif')
 import os
 os.environ['OMP_NUM_THREADS'] = "6,1"
 os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; dftb+ > PREFIX.out"
-os.environ["DFTB_PREFIX"] = "./../pbc-0-3"
+os.environ["DFTB_PREFIX"] = "/home/dlbox2/ダウンロード/pbc-0-3"
 
 
 
