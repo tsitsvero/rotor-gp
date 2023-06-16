@@ -10,38 +10,22 @@
 # https://gitlab.com/Sucerquia/ase-plumed_tutorial
 # https://dftbplus-recipes.readthedocs.io/en/latest/interfaces/ipi/ipi.html
 
-
-
 from ase import Atoms
-
-
-class AtomsWrapped(Atoms):
-    
+class AtomsWrapped(Atoms):   
     def __init__(self, *args, **kwargs):
-        super(AtomsWrapped, self).__init__(*args, **kwargs
-                                                 )
-       
+        super(AtomsWrapped, self).__init__(*args, **kwargs)      
         self.calc_history_counter = 0
-
-
     def get_forces(self):       
         forces = super(AtomsWrapped, self).get_forces()
         # energy = super(AtomsWrapped, self).get_potential_energy()
-
         from ase.io import write
         import os
-
         os.makedirs("ase_calc_history" , exist_ok=True)
         write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
         # self.calc_history.append(self.copy())       
         self.calc_history_counter += 1
-
         return forces
     
-    
-
-
-
 
 
 import os
@@ -135,15 +119,25 @@ status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i) for i in
 
 import datetime
 
-now = datetime.datetime.now()
-
+now_dir = str(datetime.datetime.now())
+now_dir = now_dir.replace(" ", "_")
+now_dir = "dump/run_calc_history_" +  now_dir
 
 for i in range(0, K):
-    new_dir = "dump/run_calc_history_" + str(now) + "/ase_calc_history_" + str(i)
-    new_dir = new_dir.replace(" ", "_")
+    new_dir = now_dir + "/ase_calc_history_" + str(i)
     # print(new_dir)
     os.makedirs(new_dir, exist_ok=True)
     os.system("cp temp/temp_calc_dir_" + str(i) + "/ase_calc_history/* " + new_dir + "/")
+
+
+os.system(f"for file in PREFIX*; do mv $file  {now_dir}/; done" )
+os.system(f"for file in *log*; do cp $file  {now_dir}/; done" )
+os.system(f"for file in *HILLS*; do mv $file  {now_dir}/; done" )
+os.system(f"for file in *COLVAR*; do mv $file  {now_dir}/; done" )
+os.system(f"for file in *RESTART*; do mv $file  {now_dir}/; done" )
+os.system(f"for file in *input*.xml; do cp $file  {now_dir}/; done" )
+
+os.system(f"cp -r plumed  {now_dir}/plumed; done" )
 
 
 print(f"Finished {K} clients with statuses: ", status)
@@ -151,7 +145,6 @@ print(f"Finished {K} clients with statuses: ", status)
 # with SocketIOCalculator(calc_base, log=sys.stdout, unixsocket='Hello') as calc:
 #         atoms.set_calculator(calc)
 #         client.run(atoms)
-
 
 # # ################# Create ASE SERVER ############################
 # https://github.com/i-pi/i-pi/blob/master/examples/ASEClient/aims_double_server/run-ase.py
