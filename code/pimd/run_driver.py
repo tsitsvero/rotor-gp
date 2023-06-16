@@ -93,14 +93,16 @@ def make_client(i):
 
 from joblib import Parallel, delayed
 
-status = Parallel(n_jobs=100, prefer="processes")(delayed(make_client)(i) for i in range(0, 32)) 
+K = 32
 
+status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i) for i in range(0, K)) 
+
+print(f"Finished {K} clients with status: ", status)
 
 # with SocketIOCalculator(calc_base, log=sys.stdout, unixsocket='Hello') as calc:
 #         atoms.set_calculator(calc)
 #         client.run(atoms)
 
-print("Finished running: ", status)
 
 # # ################# Create ASE SERVER ############################
 # https://github.com/i-pi/i-pi/blob/master/examples/ASEClient/aims_double_server/run-ase.py
