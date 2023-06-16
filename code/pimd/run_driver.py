@@ -11,6 +11,39 @@
 # https://dftbplus-recipes.readthedocs.io/en/latest/interfaces/ipi/ipi.html
 
 
+
+from ase import Atoms
+
+
+class AtomsWrapped(Atoms):
+    
+    def __init__(self, *args, **kwargs):
+        super(AtomsWrapped, self).__init__(*args, **kwargs
+                                                 )
+       
+        self.calc_history_counter = 0
+
+
+    def get_forces(self):       
+        forces = super(AtomsWrapped, self).get_forces()
+        # energy = super(AtomsWrapped, self).get_potential_energy()
+
+        from ase.io import write
+        import os
+
+        os.makedirs("ase_calc_history" , exist_ok=True)
+        write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
+        # self.calc_history.append(self.copy())       
+        self.calc_history_counter += 1
+
+        return forces
+    
+    
+
+
+
+
+
 import os
 import sys
 
@@ -27,6 +60,8 @@ from ase.calculators.dftb import Dftb
 # atoms = read("init.xyz", index='0', format='extxyz')
 # atoms = read(' ../../../structures/structures/new_systems/ktu_002.xyz')
 atoms = read('/home/dlbox2/repos/structures/structures/new_systems/ktu_002.cif')
+atoms = AtomsWrapped(atoms)
+
 
 
 # Set up the calculator #################
@@ -46,8 +81,8 @@ os.environ["DFTB_PREFIX"] = "/home/dlbox2/ダウンロード/pbc-0-3"
 
 
 def make_client(i):
-    os.makedirs("temp_calc_dir_" + str(i), exist_ok=True)
-    os.chdir("temp_calc_dir_" + str(i))
+    os.makedirs("temp/temp_calc_dir_" + str(i), exist_ok=True)
+    os.chdir("temp/temp_calc_dir_" + str(i))
 
     atoms_copy = atoms.copy()
 
@@ -97,7 +132,21 @@ K = 32
 
 status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i) for i in range(0, K)) 
 
-print(f"Finished {K} clients with status: ", status)
+
+import datetime
+
+now = datetime.datetime.now()
+
+
+for i in range(0, K):
+    new_dir = "dump/run_calc_history_" + str(now) + "/ase_calc_history_" + str(i)
+    new_dir = new_dir.replace(" ", "_")
+    # print(new_dir)
+    os.makedirs(new_dir, exist_ok=True)
+    os.system("cp temp/temp_calc_dir_" + str(i) + "/ase_calc_history/* " + new_dir + "/")
+
+
+print(f"Finished {K} clients with statuses: ", status)
 
 # with SocketIOCalculator(calc_base, log=sys.stdout, unixsocket='Hello') as calc:
 #         atoms.set_calculator(calc)
