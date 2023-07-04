@@ -1,11 +1,28 @@
+# export R=0; python ./train_and_run.py 2>&1 
+
 import ase
 from ase import io
-
 import os
+
+
+from datetime import datetime
+
+os.environ['VASP_PP_PATH'] = "/home/qklmn/repos/pseudos"
+
+def make_calc_dir():
+    dir_name = f'{datetime.now().strftime("%Y-%m-%d_%H %M-%S_%f")}'
+    dir_name = '../results/train_and_run/' + dir_name
+    os.makedirs(dir_name, exist_ok=True)
+    abs_dir_path = os.path.abspath(dir_name)
+    return abs_dir_path
+
+temp_dir = make_calc_dir()
+os.chdir(temp_dir)
+print("Saving data to directory: ", temp_dir)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-
+print("Loading training data...")
 traj_300 = io.read("/data1/simulations/datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
 traj_600 = io.read("/data1/simulations/datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
 traj_900 = io.read("/data1/simulations/datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
@@ -14,6 +31,8 @@ traj_1500 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1
 traj_1800 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
 traj_2100 = io.read("/data1/simulations/datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 print(len(traj_300), len(traj_600), len(traj_900), len(traj_1200), len(traj_1500), len(traj_1800), len(traj_2100))
+
+
 
 
 import sys
@@ -36,8 +55,8 @@ from ase import io
 
 import numpy as np
 
-# traj_md = io.read("../results/test/machine_learning/dftb_opt_1000_six_rings.traj", index=":")
-traj_md = traj_300.copy()
+
+traj_md = traj_1500.copy()
 energies_md = np.zeros(len(traj_md) )
 forces_md = np.zeros( (len(traj_md), len(traj_md[0]), 3 ) )
 for i, snap in enumerate(traj_md):
@@ -213,15 +232,8 @@ indices = np.concatenate((ind_slice, indices_high_force))
 indices = np.unique(indices)
 
 
-print(indices_high_force)
+print("High force indices: ", indices_high_force)
 print(ind_slice)
-
-
-print(indices)
-## Train Model
-# model_f.device
-# hypers = get_optimal_radial_basis_hypers(hypers, frames, expanded_max_radial=20)
-train_DX[1].shape
 
 
 from fande.models import ModelForces, GroupModelForces, ModelEnergies, MyCallbacks
