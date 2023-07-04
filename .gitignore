@@ -167,3 +167,4 @@ code/pimd/temp_calc_dir_*/*
 
 code/pimd/dump/*
 code/pimd/temp/*
+results/train_and_run/*

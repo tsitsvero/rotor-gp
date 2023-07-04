@@ -1,9 +1,31 @@
+# import argparse
+
+# # Construct the argument parser
+# ap = argparse.ArgumentParser()
+
+# # Add the arguments to the parser
+# ap.add_argument("-a", "--foperand", required=True,
+#    help="first operand")
+# ap.add_argument("-b", "--soperand", required=True,
+#    help="second operand")
+# args = vars(ap.parse_args())
+
+# print(args)
+
+
+
 # export R=0; python ./train_and_run.py 2>&1 
 
 import ase
 from ase import io
 import os
+import matplotlib.pyplot as plt
+import numpy as np
 
+import sys
+sys.path.append("../../fande") 
+# sys.path.append("..") 
+import fande
 
 from datetime import datetime
 
@@ -23,38 +45,26 @@ print("Saving data to directory: ", temp_dir)
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 print("Loading training data...")
-traj_300 = io.read("/data1/simulations/datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
-traj_600 = io.read("/data1/simulations/datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
-traj_900 = io.read("/data1/simulations/datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
-traj_1200 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
+# traj_300 = io.read("/data1/simulations/datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
+# traj_600 = io.read("/data1/simulations/datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
+# traj_900 = io.read("/data1/simulations/datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
+# traj_1200 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
 traj_1500 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
-traj_1800 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
-traj_2100 = io.read("/data1/simulations/datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
-print(len(traj_300), len(traj_600), len(traj_900), len(traj_1200), len(traj_1500), len(traj_1800), len(traj_2100))
+# traj_1800 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
+# traj_2100 = io.read("/data1/simulations/datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
+# print(len(traj_300), len(traj_600), len(traj_900), len(traj_1200), len(traj_1500), len(traj_1800), len(traj_2100))
 
 
+traj_train = traj_1500.copy()
 
-
-import sys
-sys.path.append("../../fande") # Adds higher directory to python modules path.
-# sys.path.append("..") # Adds higher directory to python modules path.
 
 import os
 machine_name = os.uname()[1]
 
 import wandb
 
-import random
 
-# random_number = random.randint(0,99)
-
-wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name)
-
-from ase.visualize import view
-from ase import io
-
-import numpy as np
-
+wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name, mode="disabled")
 
 traj_md = traj_1500.copy()
 energies_md = np.zeros(len(traj_md) )
@@ -86,75 +96,28 @@ data_units = "ev_angstrom" # standard ase units
 
 from fande.data import FandeDataModuleASE
 
-# train_centers_positions = [43,49,73,79,29,35,  53,59,69,83,25,39,  75,81,31,37,45,51]
-# train_derivatives_positions = [43,49,73,79,29,35,  53,59,69,83,25,39,  75,81,31,37,45,51]
+atoms = traj_train[0].copy()
+H_atoms = [atom.index for atom in atoms if atom.symbol == "H"]
+C_atoms = [atom.index for atom in atoms if atom.symbol == "C"]
+O_atoms = [atom.index for atom in atoms if atom.symbol == "O"]
+N_atoms = [atom.index for atom in atoms if atom.symbol == "N"]
+Si_atoms = [atom.index for atom in atoms if atom.symbol == "Si"]
+atomic_groups = [H_atoms, C_atoms, O_atoms, N_atoms, Si_atoms]
 
-
-# moving_atoms = [
-#     #   upper layer rings
-#     43,47,49,53,57,59, 45,51,55,61, 
-#     77,73,69,67,83,79, 75,71,85,81,
-#     33,29,25,23,39,35, 31,27,41,37,
-#     #   lower layer rings
-#     76,78,82,66,68,72, 80,84,70,74,
-#     32,34,38,22,24,28, 36,40,26,30,
-#     46,42,58,56,52,48, 44,60,54,50
-#       ]
-rings_carbons = [
-    #   upper layer rings
-    43,47,49,53,57,59,  
-    77,73,69,67,83,79, 
-    33,29,25,23,39,35, 
-    #   lower layer rings
-    76,78,82,66,68,72, 
-    32,34,38,22,24,28, 
-    46,42,58,56,52,48,       
-    ]
-
-rings_hydrogens = [
-    #   upper layer rings
-    45,51,55,61,
-    75,71,85,81,
-    31,27,41,37,
-    #   lower layer rings
-    80,84,70,74,
-    36,40,26,30,
-    44,60,54,50
-    ]
-
-atomic_groups = [rings_carbons, rings_hydrogens]   
-# train_centers_positions = moving_atoms_h
-# train_derivatives_positions = moving_atoms_h
-
-
-train_centers_positions = rings_carbons + rings_hydrogens
-train_derivatives_positions = rings_carbons + rings_hydrogens
-# train_centers_positions = list(range(264))
-# train_derivatives_positions = list(range(264))
-# train_derivatives_positions = [25,39,53,59,69,83]
-# train_centers_positions = [43
-# train_derivatives_positions = [
-
-# moving_atoms = [43,47,49,53,57,59,  45,51,55,61]
-# train_centers_positions = list(range(264))
-# train_derivatives_positions = list(range(264))
-
-# train_derivatives_positions = [29, 35, 43, 49, 73, 79]
-# train_centers_positions = [6, 10, 14,   7, 11, 15]
-# train_derivatives_positions = [28, 34, 72, 78, 42, 48,   29, 35, 43, 49, 73, 79]
-
+train_centers_positions = list(range(len(atoms)))
+train_derivatives_positions = list(range(len(atoms)))
 
 # Hyperparameters:
 hparams = {}
 
 # Descriptors parameters:
 soap_params = {
-    'species': ["H", "C"],
+    'species': ["H", "C", "O", "N", "Si"],
     'periodic': True,
-    'rcut': 4.0,
+    'rcut': 3.0,
     'sigma': 0.5,
-    'nmax': 6,
-    'lmax': 6,
+    'nmax': 3,
+    'lmax': 3,
     'average': "off",
     'crossover': True,
     'dtype': "float64",
@@ -184,11 +147,6 @@ fdm.calculate_invariants_librascal(
     calculation_context="test")
 
 
-# print(fdm.train_DX.shape)
-# print(fdm.test_DX.shape)
-
-import matplotlib.pyplot as plt
-
 
 for g in range(len(atomic_groups)):
     print("\n-----------")
@@ -196,17 +154,17 @@ for g in range(len(atomic_groups)):
     print("-----------")
     plt.plot(fdm.train_F[g].cpu()[1::1], linestyle = 'None', marker='o', label='train')
     plt.plot(fdm.test_F[g].cpu()[1::1], linestyle = 'None', marker='x', label='test')
-    plt.show()
+    plt.savefig("tran_test_forces_group_" + str(g) + ".png")
+    plt.close()
 
     plt.hist(fdm.test_F[g].cpu().numpy())
-    plt.show()
+    plt.savefig("histogram_forces_group_" + str(g) + ".png")
+    plt.close()
+    print(f"Number of training points for group {g}: ", fdm.train_DX[g].shape[-2])
+    print(f"Number of test points for group {g}: ", fdm.test_DX[g].shape[-2])
 
-    print("Train size: ", fdm.train_DX[g].shape[-2])
-    print("Test size: ", fdm.test_DX[g].shape[-2])
 
 
-# print(fdm.train_DX[0].shape, fdm.train_F[0].shape )
-print(fdm.test_DX[0].shape, fdm.test_F[0].shape )
 import torch
 import numpy as np
 
@@ -215,11 +173,6 @@ high_force_samples = 5
 
 random_samples = total_training_random_samples - high_force_samples
 
- 
-
-# train_dataset = TensorDataset(self.train_DX[idx][ind_slice], self.train_F[idx][ind_slice])
-# train_loader = DataLoader(train_dataset, batch_size=100_000)
-# train_data_loaders.append(train_loader)
 
 indices_high_force = torch.concat( 
     (torch.topk(fdm.test_F[0], high_force_samples//2, largest=True)[1],  
@@ -256,133 +209,128 @@ test_DX = fdm.test_DX
 test_F = fdm.test_F
 
 
-model_0_hparams = {
-    'atomic_group' : rings_carbons,
+model_H_hparams = {
+    'atomic_group' : H_atoms,
     'dtype' : hparams['dtype'],
     'device' : hparams['device'],
-    'num_epochs' : 300,
+    'num_epochs' : 30,
     'learning_rate' : 0.05,
     'soap_dim' : fdm.train_DX[0].shape[-1],
     'soap_params' : soap_params,
 }
 
-model_1_hparams = {
-    'atomic_group' : rings_hydrogens,
+model_C_hparams = {
+    'atomic_group' : C_atoms,
     'dtype' : hparams['dtype'],
     'device' : hparams['device'],
-    'num_epochs' : 300, #800 is good
+    'num_epochs' : 30, #800 is good
+    'learning_rate' : 0.05,
+    'soap_dim' : fdm.train_DX[1].shape[-1],
+    'soap_params' : soap_params,
+}
+
+model_N_hparams = {
+    'atomic_group' : N_atoms,
+    'dtype' : hparams['dtype'],
+    'device' : hparams['device'],
+    'num_epochs' : 30, #800 is good
+    'learning_rate' : 0.05,
+    'soap_dim' : fdm.train_DX[1].shape[-1],
+    'soap_params' : soap_params,
+}
+
+model_O_hparams = {
+    'atomic_group' : O_atoms,
+    'dtype' : hparams['dtype'],
+    'device' : hparams['device'],
+    'num_epochs' : 30, #800 is good
+    'learning_rate' : 0.05,
+    'soap_dim' : fdm.train_DX[1].shape[-1],
+    'soap_params' : soap_params,
+}
+
+model_Si_hparams = {
+    'atomic_group' : Si_atoms,
+    'dtype' : hparams['dtype'],
+    'device' : hparams['device'],
+    'num_epochs' : 30, #800 is good
     'learning_rate' : 0.05,
     'soap_dim' : fdm.train_DX[1].shape[-1],
     'soap_params' : soap_params,
 }
 
 
-hparams['per_model_hparams'] = [ model_0_hparams, model_1_hparams ] # access per_model_hparams by model.model_id
+hparams['per_model_hparams'] = [ model_H_hparams, model_C_hparams, model_N_hparams, model_O_hparams, model_Si_hparams ] # access per_model_hparams by model.model_id
 hparams['soap_dim'] = fdm.train_DX[0].shape[-1]
 
 
-
-
-# training_random_samples = 1000#train_F.shape[0]
-# num_epochs = 500 
-# learning_rate = 0.01
-
 ### Prepare data loaders and specify how to sample data for each group:
 total_samples_per_group = [
-    2000, 
-    2000, 
+    200, #H
+    200, #C
+    200, #N
+    200, #O
+    200, #Si    
     ]
+
 high_force_samples_per_group = [
     100,
     100,
-]
+    100,
+    100,
+    100,]
+
 train_data_loaders = fdm.prepare_train_data_loaders(
     total_samples_per_group=total_samples_per_group,
     high_force_samples_per_group=high_force_samples_per_group)
 hparams['train_indices'] = fdm.train_indices
 #####################################################################
 
-model_rings_carbons = ModelForces(
-    # train_x = train_DX[0][ind_slice], 
-    # train_y = train_F[0][ind_slice], 
+model_H = ModelForces(
     train_x = train_data_loaders[0].dataset[:][0],
     train_y = train_data_loaders[0].dataset[:][1],
-    atomic_group = rings_carbons,
+    atomic_group = H_atoms,
     hparams = hparams,
     id=0)
 
-model_rings_hydrogens = ModelForces(
-    # train_x = train_DX[1][ind_slice], 
-    # train_y = train_F[1][ind_slice], 
+model_C = ModelForces(
     train_x = train_data_loaders[1].dataset[:][0],
     train_y = train_data_loaders[1].dataset[:][1],
-    atomic_group = rings_hydrogens,
+    atomic_group = C_atoms,
     hparams = hparams,
     id=1)
 
+model_N = ModelForces(
+    train_x = train_data_loaders[2].dataset[:][0],
+    train_y = train_data_loaders[2].dataset[:][1],
+    atomic_group = N_atoms,
+    hparams = hparams,
+    id=2)
+
+model_O = ModelForces(
+    train_x = train_data_loaders[3].dataset[:][0],
+    train_y = train_data_loaders[3].dataset[:][1],
+    atomic_group = O_atoms,
+    hparams = hparams,
+    id=3)
+
+model_Si = ModelForces(
+    train_x = train_data_loaders[4].dataset[:][0],
+    train_y = train_data_loaders[4].dataset[:][1],
+    atomic_group = Si_atoms,
+    hparams = hparams,
+    id=4)
+
 
 AG_force_model = GroupModelForces(
-    models=[model_rings_carbons, model_rings_hydrogens],
+    models=[model_H, model_C, model_N, model_O, model_Si],
     train_data_loaders = train_data_loaders,
     hparams=hparams)
 
 AG_force_model.fit()
 
 
-
-
-
-
-
-
-
-
-
-
-## Predictions on test data
-from fande.predict import PredictorASE
-
-model_e = None
-trainer_e = None
-
-AG_force_model.eval()
-
-predictor = PredictorASE(
-            fdm,
-            model_e,
-            trainer_e,
-            AG_force_model,
-            # trainer_f,
-            hparams,
-            soap_params
-)
-
-# moving_atoms = [43,47,49,53,57,59,  45,51,55,61]
-# test_centers_positions = list(range(264))
-# test_derivatives_positions = list(range(264))
-# test_centers_positions = moving_atoms
-# test_derivatives_positions = moving_atoms
-# test_centers_positions = [43]
-# test_derivatives_positions = [43]
-
-# recalculate_test = True
-# if recalculate_test:
-#     test_gi = fdm.calculate_test_invariants_librascal(
-#         test_centers_positions, 
-#         test_derivatives_positions,
-#         same_centers_derivatives=True)
-
-# errors, worst_indices = 
-predictor.test_errors(plot=True, view_worst_atoms=True)
-
-
-
-
-
-
-
-
-
+### TESTING PREDICITONS ###
 
 from fande.predict import PredictorASE
 
@@ -401,55 +349,18 @@ predictor = PredictorASE(
             soap_params
 )
 
-# moving_atoms = [43,47,49,53,57,59,  45,51,55,61]
-# test_centers_positions = list(range(264))
-# test_derivatives_positions = list(range(264))
-# test_centers_positions = moving_atoms
-# test_derivatives_positions = moving_atoms
-# test_centers_positions = [43]
-# test_derivatives_positions = [43]
-
-# recalculate_test = True
-# if recalculate_test:
-#     test_gi = fdm.calculate_test_invariants_librascal(
-#         test_centers_positions, 
-#         test_derivatives_positions,
-#         same_centers_derivatives=True)
-
-# errors, worst_indices = 
 predictor.test_errors(plot=True, view_worst_atoms=True)
 
-
-
-
-
-
-## Testing area
 ### MD with fande calc
 from fande.ase import FandeCalc
 
-import os
 
-os.environ['OMP_NUM_THREADS'] = "6,1"
-os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; dftb+ > PREFIX.out"
-os.environ["DFTB_PREFIX"] = "/home/dlbox2/ダウンロード/pbc-0-3"
-
-from ase.calculators.dftb import Dftb
-# from ase.calculators.lj import LennardJones
-
-
-from runner.dynamics import MDRunner
-
-from ase.geometry.analysis import Analysis
-from ase.constraints import FixAtoms, FixBondLengths
-
+# from ase.geometry.analysis import Analysis
+# from ase.constraints import FixAtoms, FixBondLengths
 from ase.optimize import BFGS
-
 from ase import units
 from ase.io import read
-
 import logging
-
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
 from ase.md.verlet import VelocityVerlet
 from ase.md.langevin import Langevin
@@ -470,63 +381,10 @@ atoms = traj_md[200].copy()
 atoms.set_pbc(True)
 
 
-rings_carbons = [
-    #   upper layer rings
-    43,47,49,53,57,59,  
-    77,73,69,67,83,79, 
-    33,29,25,23,39,35, 
-    #   lower layer rings
-    76,78,82,66,68,72, 
-    32,34,38,22,24,28, 
-    46,42,58,56,52,48,       
-    ]
-
-rings_hydrogens = [
-    #   upper layer rings
-    45,51,55,61,
-    75,71,85,81,
-    31,27,41,37,
-    #   lower layer rings
-    80,84,70,74,
-    36,40,26,30,
-    44,60,54,50
-    ]
 atoms.calc = FandeCalc(predictor)
-atoms.calc.set_atomic_groups([rings_carbons, rings_hydrogens], titles=["Rings carbons", "Rings hydrogens"])
-atoms.calc.set_forces_errors_plot_file("../results/test/md_runs/forces_errors.png", loginterval=1)
+# atoms.calc.set_atomic_groups([rings_carbons, rings_hydrogens], titles=["Rings carbons", "Rings hydrogens"])
+# atoms.calc.set_forces_errors_plot_file("../results/test/md_runs/forces_errors.png", loginterval=1)
 # atoms.calc = LennardJones()
-
-# Supporting calc:
-# calc_dftb = Dftb(
-#             label='crystal',
-#             kpts=(1,1,1)
-#             )
-# atoms.calc.supporting_calc = calc_dftb
-
-# print( atoms.get_forces() )
-# print( atoms.get_potential_energy())
-# "../results/test/"
-# mdr = MDRunner(atoms, "../results/test/md_runs/md_test.traj", "../results/test/md_runs/md_log.log")
-# mdr.run(dt=0.5*units.fs, num_steps=200)
-
-# moving_atoms = [
-#     #   upper layer rings
-#     43,47,49,53,57,59, 45,51,55,61, 
-#     77,73,69,67,83,79, 75,71,85,81,
-#     33,29,25,23,39,35, 31,27,41,37,
-#     #   lower layer rings
-#     76,78,82,66,68,72, 80,84,70,74,
-#     32,34,38,22,24,28, 36,40,26,30,
-#     46,42,58,56,52,48, 44,60,54,50
-#       ]
-# fixed_atoms = list( set(range(264)) - set(moving_atoms) )
-# fix_atoms = FixAtoms(indices=fixed_atoms)
-# fix_atoms = FixAtoms(indices=[atom.index for atom in atoms if atom.symbol=='N' or atom.symbol=='Si' or atom.symbol=='O'])
-# fix_atoms = FixAtoms(indices=worst_atoms)
-# ch_bonds = Analysis(atoms).get_bonds("C", "H")[0]
-# fix_bond_lengths = FixBondLengths(ch_bonds)
-# atoms.set_constraint([fix_atoms, fix_bond_lengths])
-# atoms.set_constraint(fix_atoms)
 
 # Verlet dynamics:
 MaxwellBoltzmannDistribution(atoms, temperature_K=300)
@@ -553,23 +411,23 @@ MaxwellBoltzmannDistribution(atoms, temperature_K=300)
 #                    trajectory="../results/test/md_runs/md_test.traj",
 #                    logfile="../results/test/md_runs/md_log.log",)
 
-import os
+# import os
 
-os.makedirs("../results/test/md_runs/", exist_ok=True)
+os.makedirs("md_run/", exist_ok=True)
 
-dyn = NVTBerendsen(atoms, 0.5 * units.fs, 300, taut=0.5*1000*units.fs, 
-                   trajectory="../results/test/md_runs/md_test.traj",   
-                   logfile="../results/test/md_runs/md_log.log")
+# dyn = NVTBerendsen(atoms, 0.5 * units.fs, 300, taut=0.5*1000*units.fs, 
+#                    trajectory="md_run/md_test.traj",   
+#                    logfile="md_run/md_log.log")
 
-dyn.run(100)
+# dyn.run(100)
 
-# # Langevin dynamics:
+# Langevin dynamics:
 # https://databases.fysik.dtu.dk/ase/tutorials/md/md.html
-# MaxwellBoltzmannDistribution(atoms, temperature_K=300)
-# dyn = Langevin(atoms, 0.1, temperature_K=0.1/units.kB, friction=0.1,
-#                fixcm=True, trajectory='../results/test/md_runs/md_test.traj',
-#                logfile="../results/test/md_runs/md_log.log")
-# dyn.run(1000)
+MaxwellBoltzmannDistribution(atoms, temperature_K=300)
+dyn = Langevin(atoms, 0.1, temperature_K=0.1/units.kB, friction=0.1,
+               fixcm=True, trajectory='md_run/md_test.traj',
+               logfile="md_run/md_log.log")
+dyn.run(10)
 
 # # Structure optimization:
 # dyn = BFGS(
