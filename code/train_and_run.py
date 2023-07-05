@@ -12,7 +12,7 @@
 
 # print(args)
 
-
+print("Starting script...")
 
 # export R=0; python ./train_and_run.py 2>&1 
 
@@ -44,12 +44,15 @@ print("Saving data to directory: ", temp_dir)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
+data_folder = "/home/qklmn/data/"
+# data_folder = "/data1/simulations/"
+
 print("Loading training data...")
 # traj_300 = io.read("/data1/simulations/datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
 # traj_600 = io.read("/data1/simulations/datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
 # traj_900 = io.read("/data1/simulations/datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
 # traj_1200 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
-traj_1500 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
+traj_1500 = io.read(data_folder + "datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
 # traj_1800 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
 # traj_2100 = io.read("/data1/simulations/datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 # print(len(traj_300), len(traj_600), len(traj_900), len(traj_1200), len(traj_1500), len(traj_1800), len(traj_2100))
@@ -331,6 +334,7 @@ AG_force_model.fit()
 
 
 ### TESTING PREDICITONS ###
+print('Testing performance with (meta-)dynamics run...')
 
 from fande.predict import PredictorASE
 
@@ -435,3 +439,6 @@ dyn.run(10)
 #     trajectory="../results/test/md_runs/md_test.traj",
 #     logfile="../results/test/md_runs/md_log.log",)
 # dyn.run(fmax=0.1)
+
+
+print(" ALL JOBS WITHIN PYTHON SCRIPT ARE DONE! ")
