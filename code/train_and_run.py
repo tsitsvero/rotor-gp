@@ -12,7 +12,9 @@
 
 # print(args)
 
-print("Starting script...")
+# print("Starting script...")
+import time
+start_time = time.time()
 
 # export R=0; python ./train_and_run.py 2>&1 
 
@@ -42,7 +44,12 @@ temp_dir = make_calc_dir()
 os.chdir(temp_dir)
 print("Saving data to directory: ", temp_dir)
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+import sys
+log_file = temp_dir + '/LOG_GPU.log'
+sys.stdout = open(log_file, 'w')
+
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 data_folder = "/home/qklmn/data/"
 # data_folder = "/data1/simulations/"
@@ -52,13 +59,28 @@ print("Loading training data...")
 # traj_600 = io.read("/data1/simulations/datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
 # traj_900 = io.read("/data1/simulations/datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
 # traj_1200 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
-traj_1500 = io.read(data_folder + "datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
+# traj_1500 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
 # traj_1800 = io.read("/data1/simulations/datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
 # traj_2100 = io.read("/data1/simulations/datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 # print(len(traj_300), len(traj_600), len(traj_900), len(traj_1200), len(traj_1500), len(traj_1800), len(traj_2100))
 
 
-traj_train = traj_1500.copy()
+traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
+# traj_600 = io.read(data_folder + "datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
+# traj_900 = io.read(data_folder + "datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
+# traj_1200 = io.read(data_folder + "datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
+traj_1500 = io.read(data_folder + "datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
+# traj_1800 = io.read(data_folder + "datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
+# traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
+
+traj_train = traj_1500[::10].copy()
+# training_indices = np.sort(  np.arange(0, 500, 5) )  
+# traj_train = [traj_md[i] for i in training_indices]
+
+traj_test = traj_300[300:320].copy()
+# test_indices = np.sort(  np.random.choice(np.arange(0,92795), 200, replace=False) ) 
+# test_indices = np.sort(  np.arange(400,410,1) ) 
+# traj_test = [traj_md[i] for i in test_indices]
 
 
 import os
@@ -69,32 +91,21 @@ import wandb
 
 wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name, mode="disabled")
 
-traj_md = traj_1500.copy()
-energies_md = np.zeros(len(traj_md) )
-forces_md = np.zeros( (len(traj_md), len(traj_md[0]), 3 ) )
-for i, snap in enumerate(traj_md):
-    energies_md[i] = snap.get_potential_energy()
-    forces_md[i] = snap.get_forces()
-# forces_md = np.load("../../data/xtb_md/forces_xtb_md.npy")
-# energies_md = np.load("../../data/xtb_md/energies_xtb_md.npy")
-
-# Training data:
-# training_indices = np.sort(  np.random.choice(np.arange(200,220), 3, replace=False) )
-training_indices = np.sort(  np.arange(0, 500, 5) )  
-traj_train = [traj_md[i] for i in training_indices]
-energies_train = energies_md[training_indices]
-forces_train = forces_md[training_indices]
+## Train data:
+energies_train = np.zeros(len(traj_train) )
+forces_train = np.zeros( (len(traj_train), len(traj_train[0]), 3 ) )
+for i, snap in enumerate(traj_train):
+    energies_train[i] = snap.get_potential_energy()
+    forces_train[i] = snap.get_forces()
 train_data = {'trajectory': traj_train, 'energies': energies_train, 'forces': forces_train}
 
-#Test data:
-# test_indices = np.sort(  np.random.choice(np.arange(0,92795), 200, replace=False) ) 
-test_indices = np.sort(  np.arange(400,410,1) ) 
-traj_test = [traj_md[i] for i in test_indices]
-energies_test = energies_md[test_indices]
-forces_test = forces_md[test_indices]
+## Test data:
+energies_test = np.zeros(len(traj_test) )
+forces_test = np.zeros( (len(traj_test), len(traj_test[0]), 3 ) )
+for i, snap in enumerate(traj_test):
+    energies_test[i] = snap.get_potential_energy()
+    forces_test[i] = snap.get_forces()
 test_data = {'trajectory': traj_test, 'energies': energies_test, 'forces': forces_test}
-
-data_units = "ev_angstrom" # standard ase units
 
 
 from fande.data import FandeDataModuleASE
@@ -117,10 +128,10 @@ hparams = {}
 soap_params = {
     'species': ["H", "C", "O", "N", "Si"],
     'periodic': True,
-    'rcut': 3.0,
+    'rcut': 4.0,
     'sigma': 0.5,
-    'nmax': 3,
-    'lmax': 3,
+    'nmax': 4,
+    'lmax': 4,
     'average': "off",
     'crossover': True,
     'dtype': "float64",
@@ -129,7 +140,7 @@ soap_params = {
     'positions': [7, 11, 15] # ignored
 }
 
-fdm = FandeDataModuleASE(train_data, test_data, hparams, units=data_units)
+fdm = FandeDataModuleASE(train_data, test_data, hparams)
 
 fdm.calculate_invariants_librascal(
     soap_params,
@@ -216,8 +227,8 @@ model_H_hparams = {
     'atomic_group' : H_atoms,
     'dtype' : hparams['dtype'],
     'device' : hparams['device'],
-    'num_epochs' : 30,
-    'learning_rate' : 0.05,
+    'num_epochs' : 600,
+    'learning_rate' : 0.01,
     'soap_dim' : fdm.train_DX[0].shape[-1],
     'soap_params' : soap_params,
 }
@@ -226,7 +237,7 @@ model_C_hparams = {
     'atomic_group' : C_atoms,
     'dtype' : hparams['dtype'],
     'device' : hparams['device'],
-    'num_epochs' : 30, #800 is good
+    'num_epochs' : 300, #800 is good
     'learning_rate' : 0.05,
     'soap_dim' : fdm.train_DX[1].shape[-1],
     'soap_params' : soap_params,
@@ -236,7 +247,7 @@ model_N_hparams = {
     'atomic_group' : N_atoms,
     'dtype' : hparams['dtype'],
     'device' : hparams['device'],
-    'num_epochs' : 30, #800 is good
+    'num_epochs' : 300, #800 is good
     'learning_rate' : 0.05,
     'soap_dim' : fdm.train_DX[1].shape[-1],
     'soap_params' : soap_params,
@@ -246,7 +257,7 @@ model_O_hparams = {
     'atomic_group' : O_atoms,
     'dtype' : hparams['dtype'],
     'device' : hparams['device'],
-    'num_epochs' : 30, #800 is good
+    'num_epochs' : 300, #800 is good
     'learning_rate' : 0.05,
     'soap_dim' : fdm.train_DX[1].shape[-1],
     'soap_params' : soap_params,
@@ -256,7 +267,7 @@ model_Si_hparams = {
     'atomic_group' : Si_atoms,
     'dtype' : hparams['dtype'],
     'device' : hparams['device'],
-    'num_epochs' : 30, #800 is good
+    'num_epochs' : 300, #800 is good
     'learning_rate' : 0.05,
     'soap_dim' : fdm.train_DX[1].shape[-1],
     'soap_params' : soap_params,
@@ -269,19 +280,19 @@ hparams['soap_dim'] = fdm.train_DX[0].shape[-1]
 
 ### Prepare data loaders and specify how to sample data for each group:
 total_samples_per_group = [
-    200, #H
-    200, #C
-    200, #N
-    200, #O
-    200, #Si    
+    3000, #H
+    300, #C
+    300, #N
+    300, #O
+    300, #Si    
     ]
 
 high_force_samples_per_group = [
     100,
-    100,
-    100,
-    100,
-    100,]
+    10,
+    10,
+    10,
+    10,]
 
 train_data_loaders = fdm.prepare_train_data_loaders(
     total_samples_per_group=total_samples_per_group,
@@ -381,7 +392,7 @@ logging.getLogger("pytorch_lightning").setLevel(logging.ERROR) # logging.ERROR t
 # atoms = fdm.mol_traj[10].copy()
 # atoms = traj_md[300].copy()
 # atoms = traj_opt[-1].copy()
-atoms = traj_md[200].copy()
+atoms = traj_test[10].copy()
 atoms.set_pbc(True)
 
 
@@ -442,3 +453,5 @@ dyn.run(10)
 
 
 print(" ALL JOBS WITHIN PYTHON SCRIPT ARE DONE! ")
+
+print("TIMING: ", time.time()-start_time, " seconds")
