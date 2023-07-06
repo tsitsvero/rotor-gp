@@ -280,8 +280,8 @@ hparams['soap_dim'] = fdm.train_DX[0].shape[-1]
 
 ### Prepare data loaders and specify how to sample data for each group:
 total_samples_per_group = [
-    3000, #H
-    300, #C
+    10_000, #H
+    3_000, #C
     300, #N
     300, #O
     300, #Si    
