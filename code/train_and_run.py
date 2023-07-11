@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[2]:
 
 
-# ! jupyter nbconvert --to python mirror_train_and_run.ipynb 
+# ! jupyter nbconvert --to python train_and_run.ipynb 
+
+# RULES:
+# 1. Do not make plot.show() only plot.savefig()
 
 
 # ## Data loading part
 
-# In[2]:
+# In[3]:
 
 
 # import argparse
@@ -217,18 +220,9 @@ print("High force indices: ", indices_high_force)
 print(ind_slice)
 
 
-
-
-# In[5]:
-
-
-# import os
-# os.system("export PYTHONPATH=$HOME/mambaforge/envs/gpuenv/lib/python3.10/site-packages:$PYTHONPATH")
-
-
 # ## Training part
 
-# In[3]:
+# In[5]:
 
 
 from fande.models import ModelForces, GroupModelForces, ModelEnergies, MyCallbacks
@@ -308,8 +302,8 @@ hparams['soap_dim'] = fdm.train_DX[0].shape[-1]
 
 ### Prepare data loaders and specify how to sample data for each group:
 total_samples_per_group = [
-    10_000, #H
-    3_000, #C
+    1_000, #H
+    1_000, #C
     300, #N
     300, #O
     300, #Si    
