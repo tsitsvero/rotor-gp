@@ -1,3 +1,17 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[4]:
+
+
+# ! jupyter nbconvert --to python mirror_train_and_run.ipynb 
+
+
+# ## Data loading part
+
+# In[2]:
+
+
 # import argparse
 
 # # Construct the argument parser
@@ -203,6 +217,20 @@ print("High force indices: ", indices_high_force)
 print(ind_slice)
 
 
+
+
+# In[5]:
+
+
+# import os
+# os.system("export PYTHONPATH=$HOME/mambaforge/envs/gpuenv/lib/python3.10/site-packages:$PYTHONPATH")
+
+
+# ## Training part
+
+# In[3]:
+
+
 from fande.models import ModelForces, GroupModelForces, ModelEnergies, MyCallbacks
 
 import numpy as np
@@ -344,6 +372,11 @@ AG_force_model = GroupModelForces(
 AG_force_model.fit()
 
 
+# ## Testing part
+
+# In[ ]:
+
+
 ### TESTING PREDICITONS ###
 print('Testing performance with (meta-)dynamics run...')
 
@@ -365,6 +398,10 @@ predictor = PredictorASE(
 )
 
 predictor.test_errors(plot=True, view_worst_atoms=True)
+
+
+# In[ ]:
+
 
 ### MD with fande calc
 from fande.ase import FandeCalc
@@ -455,3 +492,4 @@ dyn.run(10)
 print(" ALL JOBS WITHIN PYTHON SCRIPT ARE DONE! ")
 
 print("TIMING: ", time.time()-start_time, " seconds")
+
