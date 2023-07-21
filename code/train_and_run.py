@@ -4,7 +4,7 @@
 # In[2]:
 
 
-# ! jupyter nbconvert --to python train_and_run.ipynb 
+# ! jupyter nbconvert --to python --RegexRemovePreprocessor.patterns="^%"  train_and_run.ipynb
 
 # RULES:
 # 1. Do not make plot.show() only plot.savefig()
@@ -12,7 +12,7 @@
 
 # ## Data loading part
 
-# In[3]:
+# In[85]:
 
 
 # import argparse
@@ -51,6 +51,8 @@ from datetime import datetime
 os.environ['VASP_PP_PATH'] = "/home/qklmn/repos/pseudos"
 
 def make_calc_dir():
+    if os.getcwd()[-4:] != 'code':
+        os.chdir('../../../code')
     dir_name = f'{datetime.now().strftime("%Y-%m-%d_%H %M-%S_%f")}'
     dir_name = '../results/train_and_run/' + dir_name
     os.makedirs(dir_name, exist_ok=True)
@@ -90,6 +92,7 @@ traj_1500 = io.read(data_folder + "datasets/rotors/different_temperatures/1500/O
 # traj_1800 = io.read(data_folder + "datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
 # traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 
+# traj_train = traj_1500[::10].copy()
 traj_train = traj_1500[::10].copy()
 # training_indices = np.sort(  np.arange(0, 500, 5) )  
 # traj_train = [traj_md[i] for i in training_indices]
@@ -106,7 +109,7 @@ machine_name = os.uname()[1]
 import wandb
 
 
-wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name, mode="disabled")
+wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name)
 
 ## Train data:
 energies_train = np.zeros(len(traj_train) )
@@ -145,10 +148,10 @@ hparams = {}
 soap_params = {
     'species': ["H", "C", "O", "N", "Si"],
     'periodic': True,
-    'rcut': 4.0,
+    'rcut': 3.0,
     'sigma': 0.5,
-    'nmax': 4,
-    'lmax': 4,
+    'nmax': 5,
+    'lmax': 5,
     'average': "off",
     'crossover': True,
     'dtype': "float64",
@@ -222,153 +225,23 @@ print(ind_slice)
 
 # ## Training part
 
-# In[5]:
+# In[ ]:
 
 
-from fande.models import ModelForces, GroupModelForces, ModelEnergies, MyCallbacks
-
-import numpy as np
-# seed_everything(42, workers=True)
-import torch
-
-hparams = {
-    'dtype' : 'float32',
-    'device' : 'gpu'
-}
 
 
-per_model_hparams = []
 
-train_DX = fdm.train_DX
-train_F = fdm.train_F
-test_DX = fdm.test_DX
-test_F = fdm.test_F
+# In[53]:
 
 
-model_H_hparams = {
-    'atomic_group' : H_atoms,
-    'dtype' : hparams['dtype'],
-    'device' : hparams['device'],
-    'num_epochs' : 600,
-    'learning_rate' : 0.01,
-    'soap_dim' : fdm.train_DX[0].shape[-1],
-    'soap_params' : soap_params,
-}
+# torch.count_nonzero(fdm.train_DX[2][100])
 
-model_C_hparams = {
-    'atomic_group' : C_atoms,
-    'dtype' : hparams['dtype'],
-    'device' : hparams['device'],
-    'num_epochs' : 300, #800 is good
-    'learning_rate' : 0.05,
-    'soap_dim' : fdm.train_DX[1].shape[-1],
-    'soap_params' : soap_params,
-}
-
-model_N_hparams = {
-    'atomic_group' : N_atoms,
-    'dtype' : hparams['dtype'],
-    'device' : hparams['device'],
-    'num_epochs' : 300, #800 is good
-    'learning_rate' : 0.05,
-    'soap_dim' : fdm.train_DX[1].shape[-1],
-    'soap_params' : soap_params,
-}
-
-model_O_hparams = {
-    'atomic_group' : O_atoms,
-    'dtype' : hparams['dtype'],
-    'device' : hparams['device'],
-    'num_epochs' : 300, #800 is good
-    'learning_rate' : 0.05,
-    'soap_dim' : fdm.train_DX[1].shape[-1],
-    'soap_params' : soap_params,
-}
-
-model_Si_hparams = {
-    'atomic_group' : Si_atoms,
-    'dtype' : hparams['dtype'],
-    'device' : hparams['device'],
-    'num_epochs' : 300, #800 is good
-    'learning_rate' : 0.05,
-    'soap_dim' : fdm.train_DX[1].shape[-1],
-    'soap_params' : soap_params,
-}
-
-
-hparams['per_model_hparams'] = [ model_H_hparams, model_C_hparams, model_N_hparams, model_O_hparams, model_Si_hparams ] # access per_model_hparams by model.model_id
-hparams['soap_dim'] = fdm.train_DX[0].shape[-1]
-
-
-### Prepare data loaders and specify how to sample data for each group:
-total_samples_per_group = [
-    1_000, #H
-    1_000, #C
-    300, #N
-    300, #O
-    300, #Si    
-    ]
-
-high_force_samples_per_group = [
-    100,
-    10,
-    10,
-    10,
-    10,]
-
-train_data_loaders = fdm.prepare_train_data_loaders(
-    total_samples_per_group=total_samples_per_group,
-    high_force_samples_per_group=high_force_samples_per_group)
-hparams['train_indices'] = fdm.train_indices
-#####################################################################
-
-model_H = ModelForces(
-    train_x = train_data_loaders[0].dataset[:][0],
-    train_y = train_data_loaders[0].dataset[:][1],
-    atomic_group = H_atoms,
-    hparams = hparams,
-    id=0)
-
-model_C = ModelForces(
-    train_x = train_data_loaders[1].dataset[:][0],
-    train_y = train_data_loaders[1].dataset[:][1],
-    atomic_group = C_atoms,
-    hparams = hparams,
-    id=1)
-
-model_N = ModelForces(
-    train_x = train_data_loaders[2].dataset[:][0],
-    train_y = train_data_loaders[2].dataset[:][1],
-    atomic_group = N_atoms,
-    hparams = hparams,
-    id=2)
-
-model_O = ModelForces(
-    train_x = train_data_loaders[3].dataset[:][0],
-    train_y = train_data_loaders[3].dataset[:][1],
-    atomic_group = O_atoms,
-    hparams = hparams,
-    id=3)
-
-model_Si = ModelForces(
-    train_x = train_data_loaders[4].dataset[:][0],
-    train_y = train_data_loaders[4].dataset[:][1],
-    atomic_group = Si_atoms,
-    hparams = hparams,
-    id=4)
-
-
-AG_force_model = GroupModelForces(
-    models=[model_H, model_C, model_N, model_O, model_Si],
-    train_data_loaders = train_data_loaders,
-    hparams=hparams)
-
-AG_force_model.fit()
+# fdm.train_DX[1].shape
 
 
 # ## Testing part
 
-# In[ ]:
+# In[87]:
 
 
 ### TESTING PREDICITONS ###
@@ -391,14 +264,15 @@ predictor = PredictorASE(
             soap_params
 )
 
-predictor.test_errors(plot=True, view_worst_atoms=True)
+predictor.test_errors(view_worst_atoms=True)
 
 
-# In[ ]:
+# In[72]:
 
 
 ### MD with fande calc
 from fande.ase import FandeCalc
+from ase.units import Bohr,Rydberg,kJ,kB,fs,Hartree,mol,kcal
 
 
 # from ase.geometry.analysis import Analysis
@@ -470,10 +344,10 @@ os.makedirs("md_run/", exist_ok=True)
 # Langevin dynamics:
 # https://databases.fysik.dtu.dk/ase/tutorials/md/md.html
 MaxwellBoltzmannDistribution(atoms, temperature_K=300)
-dyn = Langevin(atoms, 0.1, temperature_K=0.1/units.kB, friction=0.1,
+dyn = Langevin(atoms, 0.1*fs, temperature_K=0.1/units.kB, friction=0.1,
                fixcm=True, trajectory='md_run/md_test.traj',
                logfile="md_run/md_log.log")
-dyn.run(10)
+dyn.run(500)
 
 # # Structure optimization:
 # dyn = BFGS(
@@ -486,4 +360,16 @@ dyn.run(10)
 print(" ALL JOBS WITHIN PYTHON SCRIPT ARE DONE! ")
 
 print("TIMING: ", time.time()-start_time, " seconds")
+
+
+# In[67]:
+
+
+from ase.units import Bohr,Rydberg,kJ,kB,fs,Hartree,mol,kcal
+
+
+# In[71]:
+
+
+0.1/fs
 
