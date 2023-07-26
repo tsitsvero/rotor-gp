@@ -249,6 +249,71 @@ for g in range(len(atomic_groups)):
 
 # ## Training part
 
+# In[4]:
+
+
+import numpy as np
+# seed_everything(42, workers=True)
+import torch
+
+hparams = {
+    'dtype' : 'float32',
+    'device' : 'gpu'
+}
+
+
+per_model_hparams = []
+
+train_DX = fdm.train_DX
+train_F = fdm.train_F
+test_DX = fdm.test_DX
+test_F = fdm.test_F
+
+
+
+### Prepare data loaders and specify how to sample data for each group:
+total_samples_per_group = [
+    5_000, # ind_H_1
+    5_000, # ind_H_2
+    5_000, # ind_H_3
+    5_000, # ind_H_4    
+    5_000, # ind_C_1
+    5_000, # ind_C_2
+    5_000, # ind_C_3
+    5_000, # ind_C_4
+    5_000, # ind_C_5
+    5_000, # ind_C_6
+    5_000, # ind_C_7
+    5_000, # ind_N_1
+    5_000, # ind_O_1
+    5_000, # ind_Si_1 
+    ]
+
+high_force_samples_per_group = [
+    0, # ind_H_1
+    0, # ind_H_2
+    0, # ind_H_3
+    0, # ind_H_4    
+    0, # ind_C_1
+    0, # ind_C_2
+    0, # ind_C_3
+    0, # ind_C_4
+    0, # ind_C_5
+    0, # ind_C_6
+    0, # ind_C_7
+    0, # ind_N_1
+    0, # ind_O_1
+    0, # ind_Si_1
+    ]
+
+train_data_loaders = fdm.prepare_train_data_loaders(
+    total_samples_per_group=total_samples_per_group,
+    high_force_samples_per_group=high_force_samples_per_group)
+
+hparams['train_indices'] = fdm.train_indices
+
+
+
 # In[178]:
 
 
@@ -597,6 +662,109 @@ predictor = PredictorASE(
 )
 
 predictor.test_errors(view_worst_atoms=True)
+
+
+# In[181]:
+
+
+### MD with fande calc
+from fande.ase import FandeCalc
+from ase.units import Bohr,Rydberg,kJ,kB,fs,Hartree,mol,kcal
+
+
+# from ase.geometry.analysis import Analysis
+from ase.constraints import FixAtoms, FixBondLengths
+from ase.optimize import BFGS
+from ase import units
+from ase.io import read
+import logging
+from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
+from ase.md.verlet import VelocityVerlet
+from ase.md.langevin import Langevin
+from ase.md.npt import NPT
+from ase.md.nptberendsen import NPTBerendsen
+from ase.md.nvtberendsen import NVTBerendsen
+
+
+logging.getLogger("pytorch_lightning").setLevel(logging.ERROR) # logging.ERROR to disable or INFO
+
+# traj_md = read('../results/test/machine_learning/dftb_opt_1000_six_rings.traj', index=":")
+# traj_opt = read('../results/test/machine_learning/opt.traj', index=":")
+
+# atoms = fdm.mol_traj[10].copy()
+# atoms = traj_md[300].copy()
+# atoms = traj_opt[-1].copy()
+atoms = traj_test[10].copy()
+atoms.set_pbc(True)
+
+
+moving_atoms = sum(atomic_groups, []) 
+fixed_atoms = list( set(range(264)) - set(moving_atoms) )
+fix_atoms = FixAtoms(indices=fixed_atoms)
+atoms.set_constraint(fix_atoms)
+
+
+atoms.calc = FandeCalc(predictor)
+# atoms.calc.set_atomic_groups([rings_carbons, rings_hydrogens], titles=["Rings carbons", "Rings hydrogens"])
+# atoms.calc.set_forces_errors_plot_file("../results/test/md_runs/forces_errors.png", loginterval=1)
+# atoms.calc = LennardJones()
+
+os.makedirs("md_run/", exist_ok=True)
+
+# Verlet dynamics:
+# MaxwellBoltzmannDistribution(atoms, temperature_K=300)
+# dyn = VelocityVerlet(
+#     atoms,
+#     dt = 0.5*units.fs,
+#     trajectory="md_run/md_test.traj",
+#     logfile="md_run/md_log.log",
+# )
+
+# dyn = NPT(
+#     atoms,
+#     # dt = 0.5*units.fs,
+#     timestep=0.1,
+#     temperature_K=300,
+#     externalstress=0.0,
+#     trajectory="../results/test/md_runs/md_test.traj",
+#     logfile="../results/test/md_runs/md_log.log",
+# )
+
+# dyn = NPTBerendsen(atoms, timestep=0.1 * units.fs, temperature_K=300,
+#                    taut=100 * units.fs, pressure_au=1.01325 * units.bar,
+#                    taup=1000 * units.fs, compressibility=4.57e-5 / units.bar,
+#                    trajectory="../results/test/md_runs/md_test.traj",
+#                    logfile="../results/test/md_runs/md_log.log",)
+
+# import os
+
+
+# dyn = NVTBerendsen(atoms, 0.5 * units.fs, 300, taut=0.5*1000*units.fs, 
+#                    trajectory="md_run/md_test.traj",   
+#                    logfile="md_run/md_log.log")
+
+# dyn.run(100)
+
+# Langevin dynamics:
+# https://databases.fysik.dtu.dk/ase/tutorials/md/md.html
+MaxwellBoltzmannDistribution(atoms, temperature_K=300)
+dyn = Langevin(atoms, 0.5*fs, temperature_K=0.1/units.kB, friction=0.1,
+               fixcm=True, trajectory='md_run/md_test.traj',
+               logfile="md_run/md_log.log")
+
+dyn.run(5_000)
+
+# # Structure optimization:
+# dyn = BFGS(
+#     atoms,
+#     trajectory="../results/test/md_runs/md_test.traj",
+#     logfile="../results/test/md_runs/md_log.log",)
+# dyn.run(fmax=0.1)
+
+
+print(" ALL JOBS WITHIN PYTHON SCRIPT ARE DONE! ")
+
+print("TIMING: ", time.time()-start_time, " seconds")
 
 
 # In[221]:
