@@ -156,7 +156,7 @@ traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/O
 
 # for parameter selection purpose:
 # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
-traj_train = traj_1500[100:500:5].copy()
+traj_train = traj_1800[100:500:5].copy()
 # traj_train = traj_2100.copy()
 # training_indices = np.sort(  np.arange(0, 500, 5) )  
 # traj_train = [traj_md[i] for i in training_indices]
@@ -297,20 +297,20 @@ test_F = fdm.test_F
 
 ### Prepare data loaders and specify how to sample data for each group:
 total_samples_per_group = [
-    1_000, # ind_H_1
-    1_000, # ind_H_2
-    1_000, # ind_H_3
-    1_000, # ind_H_4    
-    1_000, # ind_C_1
-    1_000, # ind_C_2
-    1_000, # ind_C_3
-    1_000, # ind_C_4
-    1_000, # ind_C_5
-    1_000, # ind_C_6
-    1_000, # ind_C_7
-    1_000, # ind_N_1
-    1_000, # ind_O_1
-    1_000, # ind_Si_1 
+    2_000, # ind_H_1
+    2_000, # ind_H_2
+    2_000, # ind_H_3
+    2_000, # ind_H_4    
+    2_000, # ind_C_1
+    2_000, # ind_C_2
+    2_000, # ind_C_3
+    2_000, # ind_C_4
+    2_000, # ind_C_5
+    2_000, # ind_C_6
+    2_000, # ind_C_7
+    2_000, # ind_N_1
+    2_000, # ind_O_1
+    2_000, # ind_Si_1 
     ]
 
 high_force_samples_per_group = [
@@ -810,7 +810,7 @@ os.makedirs("md_run/", exist_ok=True)
 # Langevin dynamics:
 # https://databases.fysik.dtu.dk/ase/tutorials/md/md.html
 MaxwellBoltzmannDistribution(atoms, temperature_K=300, force_temp=True)
-dyn = Langevin(atoms, 0.2*fs, 
+dyn = Langevin(atoms, 0.1*fs, 
                temperature_K=300, #0.1/units.kB, 
                friction=0.02,
         #        fixcm=True, 
