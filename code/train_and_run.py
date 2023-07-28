@@ -10,6 +10,36 @@
 # 1. Do not make plot.show() only plot.savefig()
 
 
+# ## Make sweep
+
+# In[ ]:
+
+
+# # https://docs.wandb.ai/guides/sweeps/walkthrough
+
+import os
+machine_name = os.uname()[1]
+
+import wandb
+
+
+wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name, mode='disabled')
+
+# sweep_configuration = {
+#     'method': 'random',
+#     'metric': 
+#     {
+#         'goal': 'minimize', 
+#         'name': 'score'
+#         },
+#     'parameters': 
+#     {
+#         'x': {'max': 0.1, 'min': 0.01},
+#         'y': {'values': [1, 3, 7]},
+#      }
+# }
+
+
 # ## Data loading part
 
 # In[2]:
@@ -42,7 +72,7 @@ ind_Si_1 = [0, 1, 2, 3, 4, 5]
 len(ind_C_1 + ind_C_2 + ind_C_3 + ind_C_4 + ind_C_5 + ind_C_6 + ind_C_7) + len(ind_H_1 + ind_H_2 + ind_H_3 + ind_H_4)+ len(ind_N_1)+ len(ind_O_1)+ len(ind_Si_1)
 
 
-# In[3]:
+# In[427]:
 
 
 # %%time
@@ -117,14 +147,16 @@ print("Loading training data...")
 
 
 traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
-# traj_600 = io.read(data_folder + "datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
+traj_600 = io.read(data_folder + "datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
 # traj_900 = io.read(data_folder + "datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
 # traj_1200 = io.read(data_folder + "datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
 traj_1500 = io.read(data_folder + "datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
 traj_1800 = io.read(data_folder + "datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
 traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 
-traj_train = traj_1800.copy() + traj_2100.copy()
+# for parameter selection purpose:
+# traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
+traj_train = traj_1500[100:500:4].copy()
 # traj_train = traj_2100.copy()
 # training_indices = np.sort(  np.arange(0, 500, 5) )  
 # traj_train = [traj_md[i] for i in training_indices]
@@ -134,14 +166,6 @@ traj_test = traj_300[400:420].copy()
 # test_indices = np.sort(  np.arange(400,410,1) ) 
 # traj_test = [traj_md[i] for i in test_indices]
 
-
-import os
-machine_name = os.uname()[1]
-
-import wandb
-
-
-wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name, mode='disabled')
 
 
 from fande.data import FandeDataModuleASE
@@ -171,19 +195,21 @@ train_derivatives_positions = sum(atomic_groups, [])#list(range(len(atoms)))
 hparams = {}
 
 # Descriptors parameters:
+# https://github.com/lab-cosmo/librascal/blob/master/examples/MLIP_example.ipynb
 soap_params = {
-    'species': ["H", "C", "O", "N", "Si"],
-    'periodic': True,
-    'rcut': 3.0,
-    'sigma': 0.5,
-    'nmax': 4,
-    'lmax': 4,
-    'average': "off",
-    'crossover': True,
-    'dtype': "float64",
-    'n_jobs': 10,
-    'sparse': False,
-    'positions': [7, 11, 15] # ignored
+    # 'species': ["H", "C", "O", "N", "Si"],
+    # 'periodic': True,
+    'interaction_cutoff': 3.0,
+    'gaussian_sigma_constant': 0.3,
+    'max_radial': 4,
+    'max_angular': 4,
+    'cutoff_smooth_width': 0.1,
+    # 'average': "off",
+    # 'crossover': True,
+    # 'dtype': "float64",
+    # 'n_jobs': 10,
+    # 'sparse': False,
+    # 'positions': [7, 11, 15] # ignored
 }
 
 fdm = FandeDataModuleASE(train_data, test_data, hparams)
@@ -245,11 +271,9 @@ for g in range(len(atomic_groups)):
 # print(ind_slice)
 
 
-# 
-
 # ## Training part
 
-# In[4]:
+# In[424]:
 
 
 import numpy as np
@@ -273,20 +297,20 @@ test_F = fdm.test_F
 
 ### Prepare data loaders and specify how to sample data for each group:
 total_samples_per_group = [
-    5_000, # ind_H_1
-    5_000, # ind_H_2
-    5_000, # ind_H_3
-    5_000, # ind_H_4    
-    5_000, # ind_C_1
-    5_000, # ind_C_2
-    5_000, # ind_C_3
-    5_000, # ind_C_4
-    5_000, # ind_C_5
-    5_000, # ind_C_6
-    5_000, # ind_C_7
-    5_000, # ind_N_1
-    5_000, # ind_O_1
-    5_000, # ind_Si_1 
+    2_000, # ind_H_1
+    2_000, # ind_H_2
+    2_000, # ind_H_3
+    2_000, # ind_H_4    
+    2_000, # ind_C_1
+    2_000, # ind_C_2
+    2_000, # ind_C_3
+    2_000, # ind_C_4
+    2_000, # ind_C_5
+    2_000, # ind_C_6
+    2_000, # ind_C_7
+    2_000, # ind_N_1
+    2_000, # ind_O_1
+    2_000, # ind_Si_1 
     ]
 
 high_force_samples_per_group = [
@@ -314,11 +338,11 @@ hparams['train_indices'] = fdm.train_indices
 
 
 
-# In[178]:
+# In[425]:
 
 
-n_steps = 300
-lr = 0.01
+n_steps = 100
+lr = 0.04
 
 model_H_1_hparams = {
     'atomic_group' : ind_H_1,
@@ -638,7 +662,7 @@ AG_force_model.fit()
 
 # ## Testing part
 
-# In[179]:
+# In[426]:
 
 
 ### TESTING PREDICITONS ###
@@ -661,10 +685,12 @@ predictor = PredictorASE(
             soap_params
 )
 
-predictor.test_errors(view_worst_atoms=True)
+rmse_per_model, mae_per_model = predictor.test_errors(view_worst_atoms=True)
+
+rmse_per_model
 
 
-# In[181]:
+# In[360]:
 
 
 ### MD with fande calc
@@ -747,9 +773,12 @@ os.makedirs("md_run/", exist_ok=True)
 
 # Langevin dynamics:
 # https://databases.fysik.dtu.dk/ase/tutorials/md/md.html
-MaxwellBoltzmannDistribution(atoms, temperature_K=300)
-dyn = Langevin(atoms, 0.5*fs, temperature_K=0.1/units.kB, friction=0.1,
-               fixcm=True, trajectory='md_run/md_test.traj',
+MaxwellBoltzmannDistribution(atoms, temperature_K=300, force_temp=True)
+dyn = Langevin(atoms, 0.2*fs, 
+               temperature_K=300, #0.1/units.kB, 
+               friction=0.02,
+        #        fixcm=True, 
+               trajectory='md_run/md_test.traj',
                logfile="md_run/md_log.log")
 
 dyn.run(5_000)
@@ -770,5 +799,5 @@ print("TIMING: ", time.time()-start_time, " seconds")
 # In[221]:
 
 
-from ase.units import Bohr,Rydberg,kJ,kB,fs,Hartree,mol,kcal
+# from ase.units import Bohr,Rydberg,kJ,kB,fs,Hartree,mol,kcal
 
