@@ -72,7 +72,7 @@ ind_Si_1 = sorted( [0, 1, 2, 3, 4, 5] )
 len(ind_C_1 + ind_C_2 + ind_C_3 + ind_C_4 + ind_C_5 + ind_C_6 + ind_C_7) + len(ind_H_1 + ind_H_2 + ind_H_3 + ind_H_4)+ len(ind_N_1)+ len(ind_O_1)+ len(ind_Si_1)
 
 
-# In[82]:
+# In[144]:
 
 
 # %%time
@@ -122,8 +122,14 @@ def make_calc_dir():
     return abs_dir_path
 
 temp_dir = make_calc_dir()
+
+# copy exec file to the folder for help:
+import shutil
+shutil.copy('train_and_run.py', temp_dir + '/train_and_run.py')
+
 os.chdir(temp_dir)
 print("Saving data to directory: ", temp_dir)
+
 
 
 import sys
@@ -156,7 +162,7 @@ traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/O
 
 # for parameter selection purpose:
 # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
-traj_train = traj_1800[100:500:5].copy()
+traj_train = traj_2100[100:500].copy()
 # traj_train = traj_2100.copy()
 # training_indices = np.sort(  np.arange(0, 500, 5) )  
 # traj_train = [traj_md[i] for i in training_indices]
@@ -273,7 +279,7 @@ for g in range(len(atomic_groups)):
 
 # ## Training part
 
-# In[83]:
+# In[146]:
 
 
 import numpy as np
@@ -294,23 +300,25 @@ test_DX = fdm.test_DX
 test_F = fdm.test_F
 
 
+N_samples = 10_000
+# N_factor = 1.0
 
 ### Prepare data loaders and specify how to sample data for each group:
 total_samples_per_group = [
-    2_000, # ind_H_1
-    2_000, # ind_H_2
-    2_000, # ind_H_3
-    2_000, # ind_H_4    
-    2_000, # ind_C_1
-    2_000, # ind_C_2
-    2_000, # ind_C_3
-    2_000, # ind_C_4
-    2_000, # ind_C_5
-    2_000, # ind_C_6
-    2_000, # ind_C_7
-    2_000, # ind_N_1
-    2_000, # ind_O_1
-    2_000, # ind_Si_1 
+    N_samples, # ind_H_1
+    N_samples, # ind_H_2
+    N_samples, # ind_H_3
+    N_samples, # ind_H_4    
+    N_samples, # ind_C_1
+    N_samples, # ind_C_2
+    N_samples, # ind_C_3
+    N_samples, # ind_C_4
+    N_samples, # ind_C_5
+    N_samples, # ind_C_6
+    N_samples, # ind_C_7
+    N_samples, # ind_N_1
+    N_samples, # ind_O_1
+    N_samples, # ind_Si_1 
     ]
 
 high_force_samples_per_group = [
@@ -341,8 +349,8 @@ hparams['train_indices'] = fdm.train_indices
 # In[126]:
 
 
-n_steps = 100
-lr = 0.04 # 0.04 for ARD
+n_steps = 200
+lr = 0.005 # 0.04 for ARD
 
 import logging
 
@@ -800,8 +808,8 @@ os.makedirs("md_run/", exist_ok=True)
 
 # import os
 
-
-# dyn = NVTBerendsen(atoms, 0.5 * units.fs, 300, taut=0.5*1000*units.fs, 
+# MaxwellBoltzmannDistribution(atoms, temperature_K=300, force_temp=True)
+# dyn = NVTBerendsen(atoms, 0.2 * units.fs, 300, taut=0.5*1000*units.fs, 
 #                    trajectory="md_run/md_test.traj",   
 #                    logfile="md_run/md_log.log")
 
@@ -809,10 +817,10 @@ os.makedirs("md_run/", exist_ok=True)
 
 # Langevin dynamics:
 # https://databases.fysik.dtu.dk/ase/tutorials/md/md.html
-MaxwellBoltzmannDistribution(atoms, temperature_K=300, force_temp=True)
-dyn = Langevin(atoms, 0.1*fs, 
+# MaxwellBoltzmannDistribution(atoms, temperature_K=100, force_temp=True)
+dyn = Langevin(atoms, 0.2*fs, 
                temperature_K=300, #0.1/units.kB, 
-               friction=0.02,
+               friction=0.1,
         #        fixcm=True, 
                trajectory='md_run/md_test.traj',
                logfile="md_run/md_log.log")
