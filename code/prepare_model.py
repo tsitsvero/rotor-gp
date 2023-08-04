@@ -40,7 +40,9 @@ def prepare_data(hparams, soap_params):
         import numpy as np
 
         import sys
-        sys.path.append("../../fande") 
+        sys.path.append("../../fande")
+        sys.path.append("../../../fande")
+        # sys.path.append("../../fande") 
         # sys.path.append("..") 
         import fande
 
@@ -50,7 +52,7 @@ def prepare_data(hparams, soap_params):
 
         def make_calc_dir():
                 if os.getcwd()[-4:] != 'code':
-                        os.chdir('../../../code')
+                        os.chdir('/home/qklmn/repos/rotor-gp/code')
                 dir_name = f'{datetime.now().strftime("%Y-%m-%d_%H %M-%S_%f")}'
                 dir_name = '../results/train_and_run/' + dir_name
                 os.makedirs(dir_name, exist_ok=True)
@@ -89,16 +91,16 @@ def prepare_data(hparams, soap_params):
 
 
         traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
-        traj_600 = io.read(data_folder + "datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
+        # traj_600 = io.read(data_folder + "datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
         # traj_900 = io.read(data_folder + "datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
         # traj_1200 = io.read(data_folder + "datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
-        traj_1500 = io.read(data_folder + "datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
-        traj_1800 = io.read(data_folder + "datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
+        # traj_1500 = io.read(data_folder + "datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
+        # traj_1800 = io.read(data_folder + "datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
         traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 
         # for parameter selection purpose:
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
-        traj_train = traj_2100[100:500:20].copy()
+        traj_train = traj_2100[100:500:200].copy()
         # traj_train = traj_2100.copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
@@ -583,15 +585,25 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
 
 def prepare_fande_ase_calc(hparams, soap_params):
 
+
+        import os
+        machine_name = os.uname()[1]
+        import wandb
+        wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name, mode='disabled')
+
+        import sys
+        sys.path.append("../../fande")
+        sys.path.append("../../../fande")
+
         from fande.predict import PredictorASE
         from fande.ase import FandeCalc
 
 
         fdm = prepare_data(hparams, soap_params)
 
-        train_data_loaders = sample_data(fdm, N_samples=1000)
+        train_data_loaders = sample_data(fdm, N_samples=100)
 
-        AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 2, 0.1)
+        AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 1, 0.1)
 
         predictor = PredictorASE(
                     fdm,
