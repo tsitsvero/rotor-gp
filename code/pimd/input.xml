@@ -10,7 +10,7 @@
   </ffsocket>
   <system>
     <initialize nbeads='5'>
-      <file mode='ase'>  ktu_002.cif </file>
+      <file mode='ase'>  /home/qklmn/repos/structures/structures/new_systems/ktu_002.cif </file>
     </initialize>
     <forces>
       <force forcefield='mycalc'> </force>
