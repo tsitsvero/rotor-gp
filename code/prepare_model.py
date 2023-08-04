@@ -1,34 +1,31 @@
 
 
+#Hydrogen: 
+ind_H_1 = sorted([117, 119, 123, 125, 135, 137, 116, 118, 122, 124, 134, 136]) 
+ind_H_2 = sorted([115, 121, 127, 129, 133, 139, 132, 138, 126, 128, 114, 120] )
+ind_H_3 = sorted([130, 131, 140, 141, 142, 143, 144, 145, 164, 165, 166, 167, 192, 193, 206, 207, 250, 251] )
+ind_H_4 = sorted([146, 148, 150, 147, 149, 151, 152, 154, 156, 153, 155, 157, 158, 160, 162, 159, 161, 163, 168, 170, 172, 169, 171, 173, 174, 176, 178, 175, 177, 179, 180, 182, 184, 181, 183, 185, 186, 188, 190, 187, 189, 191, 194, 196, 198, 195, 197, 199, 200, 202, 204, 201, 203, 205, 208, 210, 212, 209, 211, 213, 214, 216, 218, 215, 217, 219, 220, 222, 224, 221, 223, 225, 226, 228, 230, 227, 229, 231, 232, 234, 236, 233, 235, 237, 238, 240, 242, 239, 241, 243, 244, 246, 248, 245, 247, 249, 252, 254, 256, 253, 255, 257, 258, 260, 262, 259, 261, 263] )
+#Carbon: 
+ind_C_1 = sorted([6, 8, 10, 7, 9, 11] )
+ind_C_2 = sorted([18, 26, 44, 19, 27, 45] )
+ind_C_3 = sorted([24, 28, 16, 20, 42, 46, 17, 21, 25, 29, 43, 47] )
+ind_C_4 = sorted([30, 34, 14, 22, 40, 48, 15, 23, 31, 35, 41, 49] )
+ind_C_5 = sorted([12, 13, 32, 33, 38, 39] )
+ind_C_6 = sorted([36, 50, 64, 37, 51, 65, 52, 54, 80, 53, 55, 81, 62, 74, 96, 63, 75, 97] )
+ind_C_7 = sorted([56, 60, 57, 61, 68, 72, 69, 73, 66, 70, 67, 71, 78, 84, 79, 85, 58, 59, 88, 90, 89, 91, 86, 87, 92, 94, 93, 95, 76, 77, 82, 83, 98, 100, 99, 101] )
+#Nytrogen: 
+ind_N_1 = sorted( [102, 103, 104, 105, 106, 107] )
+#Oxygen: 
+ind_O_1 = sorted( [108, 109, 110, 111, 112, 113] )
+#Silicon: 
+ind_Si_1 = sorted( [0, 1, 2, 3, 4, 5] )
+
+# len(ind_C_1 + ind_C_2 + ind_C_3 + ind_C_4 + ind_C_5 + ind_C_6 + ind_C_7) + len(ind_H_1 + ind_H_2 + ind_H_3 + ind_H_4)+ len(ind_N_1)+ len(ind_O_1)+ len(ind_Si_1)
 
 
 
-def prepare_data():
+def prepare_data(hparams, soap_params):
     
-        #Hydrogen: 
-        ind_H_1 = sorted([117, 119, 123, 125, 135, 137, 116, 118, 122, 124, 134, 136]) 
-        ind_H_2 = sorted([115, 121, 127, 129, 133, 139, 132, 138, 126, 128, 114, 120] )
-        ind_H_3 = sorted([130, 131, 140, 141, 142, 143, 144, 145, 164, 165, 166, 167, 192, 193, 206, 207, 250, 251] )
-        ind_H_4 = sorted([146, 148, 150, 147, 149, 151, 152, 154, 156, 153, 155, 157, 158, 160, 162, 159, 161, 163, 168, 170, 172, 169, 171, 173, 174, 176, 178, 175, 177, 179, 180, 182, 184, 181, 183, 185, 186, 188, 190, 187, 189, 191, 194, 196, 198, 195, 197, 199, 200, 202, 204, 201, 203, 205, 208, 210, 212, 209, 211, 213, 214, 216, 218, 215, 217, 219, 220, 222, 224, 221, 223, 225, 226, 228, 230, 227, 229, 231, 232, 234, 236, 233, 235, 237, 238, 240, 242, 239, 241, 243, 244, 246, 248, 245, 247, 249, 252, 254, 256, 253, 255, 257, 258, 260, 262, 259, 261, 263] )
-        #Carbon: 
-        ind_C_1 = sorted([6, 8, 10, 7, 9, 11] )
-        ind_C_2 = sorted([18, 26, 44, 19, 27, 45] )
-        ind_C_3 = sorted([24, 28, 16, 20, 42, 46, 17, 21, 25, 29, 43, 47] )
-        ind_C_4 = sorted([30, 34, 14, 22, 40, 48, 15, 23, 31, 35, 41, 49] )
-        ind_C_5 = sorted([12, 13, 32, 33, 38, 39] )
-        ind_C_6 = sorted([36, 50, 64, 37, 51, 65, 52, 54, 80, 53, 55, 81, 62, 74, 96, 63, 75, 97] )
-        ind_C_7 = sorted([56, 60, 57, 61, 68, 72, 69, 73, 66, 70, 67, 71, 78, 84, 79, 85, 58, 59, 88, 90, 89, 91, 86, 87, 92, 94, 93, 95, 76, 77, 82, 83, 98, 100, 99, 101] )
-        #Nytrogen: 
-        ind_N_1 = sorted( [102, 103, 104, 105, 106, 107] )
-        #Oxygen: 
-        ind_O_1 = sorted( [108, 109, 110, 111, 112, 113] )
-        #Silicon: 
-        ind_Si_1 = sorted( [0, 1, 2, 3, 4, 5] )
-
-        # len(ind_C_1 + ind_C_2 + ind_C_3 + ind_C_4 + ind_C_5 + ind_C_6 + ind_C_7) + len(ind_H_1 + ind_H_2 + ind_H_3 + ind_H_4)+ len(ind_N_1)+ len(ind_O_1)+ len(ind_Si_1)
-
-
-
 
         # print("Starting script...")
         import time
@@ -101,7 +98,7 @@ def prepare_data():
 
         # for parameter selection purpose:
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
-        traj_train = traj_2100[100:500].copy()
+        traj_train = traj_2100[100:500:20].copy()
         # traj_train = traj_2100.copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
@@ -136,26 +133,6 @@ def prepare_data():
         train_centers_positions = sum(atomic_groups, []) #list(range(len(atoms)))
         train_derivatives_positions = sum(atomic_groups, [])#list(range(len(atoms)))
 
-        # Hyperparameters:
-        hparams = {}
-
-        # Descriptors parameters:
-        # https://github.com/lab-cosmo/librascal/blob/master/examples/MLIP_example.ipynb
-        soap_params = {
-        # 'species': ["H", "C", "O", "N", "Si"],
-        # 'periodic': True,
-        'interaction_cutoff': 3.0,
-        'gaussian_sigma_constant': 0.3,
-        'max_radial': 4,
-        'max_angular': 4,
-        'cutoff_smooth_width': 0.1,
-        # 'average': "off",
-        # 'crossover': True,
-        # 'dtype': "float64",
-        # 'n_jobs': 10,
-        # 'sparse': False,
-        # 'positions': [7, 11, 15] # ignored
-        }
 
         fdm = FandeDataModuleASE(train_data, test_data, hparams)
 
@@ -216,25 +193,17 @@ def prepare_data():
         # print(ind_slice)
 
 
+        return fdm
+
+
+def sample_data(fdm, N_samples):
+
         import numpy as np
         # seed_everything(42, workers=True)
         import torch
 
-        hparams = {
-        'dtype' : 'float32',
-        'device' : 'gpu'
-        }
 
-
-        per_model_hparams = []
-
-        train_DX = fdm.train_DX
-        train_F = fdm.train_F
-        test_DX = fdm.test_DX
-        test_F = fdm.test_F
-
-
-        N_samples = 10_000
+        # N_samples = 10_000
         # N_factor = 1.0
 
         ### Prepare data loaders and specify how to sample data for each group:
@@ -276,14 +245,363 @@ def prepare_data():
         total_samples_per_group=total_samples_per_group,
         high_force_samples_per_group=high_force_samples_per_group)
 
-        hparams['train_indices'] = fdm.train_indices
+        # hparams['train_indices'] = fdm.train_indices
 
 
         return train_data_loaders
 
 
 
-def prepare_model():
-    
+def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_rate):
 
-    return 0
+        lr = learning_rate
+
+        import logging
+
+        logging.getLogger("pytorch_lightning").setLevel(logging.INFO) # logging.ERROR to disable or INFO
+
+        model_H_1_hparams = {
+        'atomic_group' : ind_H_1,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[0].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_H_2_hparams = {
+        'atomic_group' : ind_H_2,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[1].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_H_3_hparams = {
+        'atomic_group' : ind_H_3,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[2].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_H_4_hparams = {
+        'atomic_group' : ind_H_4,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[3].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        hparams_models_H = [model_H_1_hparams, model_H_2_hparams, model_H_3_hparams, model_H_4_hparams]
+
+        model_C_1_hparams = {
+        'atomic_group' : ind_C_1,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[4].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_C_2_hparams = {
+        'atomic_group' : ind_C_2,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[5].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_C_3_hparams = {
+        'atomic_group' : ind_C_3,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[6].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_C_4_hparams = {
+        'atomic_group' : ind_C_4,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[7].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_C_5_hparams = {
+        'atomic_group' : ind_C_5,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[8].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_C_6_hparams = {
+        'atomic_group' : ind_C_6,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[9].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        model_C_7_hparams = {
+        'atomic_group' : ind_C_7,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[10].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+
+        hparams_models_C =  [model_C_1_hparams, model_C_2_hparams, model_C_3_hparams, model_C_4_hparams, model_C_5_hparams,  model_C_6_hparams,  model_C_7_hparams]
+
+        model_N_1_hparams = {
+        'atomic_group' : ind_N_1,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[11].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        hparams_models_N =  [model_N_1_hparams]
+
+        model_O_1_hparams = {
+        'atomic_group' : ind_O_1,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[12].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        hparams_models_O =  [model_O_1_hparams]
+
+
+        model_Si_1_hparams = {
+        'atomic_group' : ind_Si_1,
+        'dtype' : hparams['dtype'],
+        'device' : hparams['device'],
+        'num_epochs' : n_steps,
+        'learning_rate' : lr,
+        'soap_dim' : train_data_loaders[13].dataset[0][0].shape[-1],
+        'soap_params' : soap_params,
+        }
+
+        hparams_models_Si =  [model_Si_1_hparams]
+
+        # model_Si_hparams = {
+        #     'atomic_group' : Si_atoms,
+        #     'dtype' : hparams['dtype'],
+        #     'device' : hparams['device'],
+        #     'num_epochs' : 1, 
+        #     'learning_rate' : 0.01,
+        #     'soap_dim' : fdm.train_DX[1].shape[-1],
+        #     'soap_params' : soap_params,
+        # }
+
+
+        hparams['per_model_hparams'] = [ 
+        model_H_1_hparams,
+        model_H_2_hparams,
+        model_H_3_hparams,
+        model_H_4_hparams, 
+        model_C_1_hparams,
+        model_C_2_hparams,
+        model_C_3_hparams,
+        model_C_4_hparams,
+        model_C_5_hparams,
+        model_C_6_hparams,
+        model_C_7_hparams,
+        model_N_1_hparams,
+        model_O_1_hparams,
+        model_Si_1_hparams
+        ] # access per_model_hparams by model.model_id
+
+        # hparams['soap_dim'] = fdm.train_DX[0].shape[-1]
+
+
+        #####################################################################
+
+        from fande.models import ModelForces, GroupModelForces, ModelEnergies, MyCallbacks
+
+        model_H_1 = ModelForces(
+        train_x = train_data_loaders[0].dataset[:][0],
+        train_y = train_data_loaders[0].dataset[:][1],
+        atomic_group = ind_H_1,
+        hparams = hparams,
+        id=0)
+
+        model_H_2 = ModelForces(
+        train_x = train_data_loaders[1].dataset[:][0],
+        train_y = train_data_loaders[1].dataset[:][1],
+        atomic_group = ind_H_2,
+        hparams = hparams,
+        id=1)
+
+        model_H_3 = ModelForces(
+        train_x = train_data_loaders[2].dataset[:][0],
+        train_y = train_data_loaders[2].dataset[:][1],
+        atomic_group = ind_H_3,
+        hparams = hparams,
+        id=2)
+
+        model_H_4 = ModelForces(
+        train_x = train_data_loaders[3].dataset[:][0],
+        train_y = train_data_loaders[3].dataset[:][1],
+        atomic_group = ind_H_4,
+        hparams = hparams,
+        id=3)
+
+
+
+        model_C_1 = ModelForces(
+        train_x = train_data_loaders[4].dataset[:][0],
+        train_y = train_data_loaders[4].dataset[:][1],
+        atomic_group = ind_C_1,
+        hparams = hparams,
+        id=4)
+
+        model_C_2 = ModelForces(
+        train_x = train_data_loaders[5].dataset[:][0],
+        train_y = train_data_loaders[5].dataset[:][1],
+        atomic_group = ind_C_2,
+        hparams = hparams,
+        id=5)
+
+        model_C_3 = ModelForces(
+        train_x = train_data_loaders[6].dataset[:][0],
+        train_y = train_data_loaders[6].dataset[:][1],
+        atomic_group = ind_C_3,
+        hparams = hparams,
+        id=6)
+
+        model_C_4 = ModelForces(
+        train_x = train_data_loaders[7].dataset[:][0],
+        train_y = train_data_loaders[7].dataset[:][1],
+        atomic_group = ind_C_4,
+        hparams = hparams,
+        id=7)
+
+        model_C_5 = ModelForces(
+        train_x = train_data_loaders[8].dataset[:][0],
+        train_y = train_data_loaders[8].dataset[:][1],
+        atomic_group = ind_C_5,
+        hparams = hparams,
+        id=8)
+
+        model_C_6 = ModelForces(
+        train_x = train_data_loaders[9].dataset[:][0],
+        train_y = train_data_loaders[9].dataset[:][1],
+        atomic_group = ind_C_6,
+        hparams = hparams,
+        id=9)
+
+        model_C_7 = ModelForces(
+        train_x = train_data_loaders[10].dataset[:][0],
+        train_y = train_data_loaders[10].dataset[:][1],
+        atomic_group = ind_C_7,
+        hparams = hparams,
+        id=10)
+
+
+
+        model_N_1 = ModelForces(
+        train_x = train_data_loaders[11].dataset[:][0],
+        train_y = train_data_loaders[11].dataset[:][1],
+        atomic_group = ind_N_1,
+        hparams = hparams,
+        id=11)
+
+
+        model_O_1 = ModelForces(
+        train_x = train_data_loaders[12].dataset[:][0],
+        train_y = train_data_loaders[12].dataset[:][1],
+        atomic_group = ind_O_1,
+        hparams = hparams,
+        id=12)
+
+        model_Si_1 = ModelForces(
+        train_x = train_data_loaders[13].dataset[:][0],
+        train_y = train_data_loaders[13].dataset[:][1],
+        atomic_group = ind_Si_1,
+        hparams = hparams,
+        id=13)
+
+
+
+
+        AG_force_model = GroupModelForces(
+        models= [
+                model_H_1, 
+                model_H_2, 
+                model_H_3, 
+                model_H_4, 
+                model_C_1, 
+                model_C_2, 
+                model_C_3, 
+                model_C_4, 
+                model_C_5,
+                model_C_6, 
+                model_C_7, 
+                model_N_1,
+                model_O_1, 
+                model_Si_1,
+                ], # model_N, model_O, model_Si],
+        train_data_loaders = train_data_loaders,
+        hparams=hparams)
+
+        AG_force_model.fit()
+
+
+        return AG_force_model
+
+
+
+
+def prepare_fande_ase_calc(hparams, soap_params):
+
+        from fande.predict import PredictorASE
+        from fande.ase import FandeCalc
+
+
+        fdm = prepare_data(hparams, soap_params)
+
+        train_data_loaders = sample_data(fdm, N_samples=1000)
+
+        AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 2, 0.1)
+
+        predictor = PredictorASE(
+                    fdm,
+                    AG_force_model,
+                    hparams,
+                    soap_params
+        )
+
+
+        fande_calc = FandeCalc(predictor)
+
+
+        return fande_calc
