@@ -95,11 +95,11 @@ soap_params = {
 import sys
 sys.path.append("../../fande")
 
-def make_client(i):
+def make_client(i, gpu_id_list):
     os.makedirs("results/temp/temp_calc_dir_" + str(i), exist_ok=True)
     os.chdir("results/temp/temp_calc_dir_" + str(i))
 
-    fande_calc = prepare_fande_ase_calc(hparams, soap_params)
+    fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
     calc = fande_calc
 
     atoms_copy = atoms.copy()
@@ -146,9 +146,10 @@ def make_client(i):
 
 from joblib import Parallel, delayed
 
-K = 2
+K = 10
+gpu_id_list = [0, 1, 2, 3, 4, 5, 2, 3, 0, 1]
 
-status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i) for i in range(0, K)) 
+status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i, gpu_id_list) for i in range(0, K)) 
 
 
 # import datetime

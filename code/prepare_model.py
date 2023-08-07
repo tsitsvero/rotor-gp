@@ -24,7 +24,7 @@ ind_Si_1 = sorted( [0, 1, 2, 3, 4, 5] )
 
 
 
-def prepare_data(hparams, soap_params):
+def prepare_data(hparams, soap_params, traj_sample_rate=1):
     
 
         # print("Starting script...")
@@ -100,10 +100,11 @@ def prepare_data(hparams, soap_params):
 
         # for parameter selection purpose:
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
-        traj_train = traj_2100[100:500:200].copy()
+        traj_train = traj_2100[100:500]
         # traj_train = traj_2100.copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
+        traj_train = traj_train[100:500:traj_sample_rate].copy()
 
         traj_test = traj_300[400:420].copy()
         # test_indices = np.sort(  np.random.choice(np.arange(0,92795), 200, replace=False) ) 
@@ -254,7 +255,7 @@ def sample_data(fdm, N_samples):
 
 
 
-def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_rate):
+def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_rate, gpu_id):
 
         lr = learning_rate
 
@@ -573,7 +574,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
                 model_Si_1,
                 ], # model_N, model_O, model_Si],
         train_data_loaders = train_data_loaders,
-        hparams=hparams)
+        hparams=hparams, 
+        gpu_id=gpu_id)
 
         AG_force_model.fit()
 
@@ -583,7 +585,7 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
 
 
 
-def prepare_fande_ase_calc(hparams, soap_params):
+def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
 
         import os
@@ -599,11 +601,11 @@ def prepare_fande_ase_calc(hparams, soap_params):
         from fande.ase import FandeCalc
 
 
-        fdm = prepare_data(hparams, soap_params)
+        fdm = prepare_data(hparams, soap_params, traj_sample_rate=5)
 
-        train_data_loaders = sample_data(fdm, N_samples=100)
+        train_data_loaders = sample_data(fdm, N_samples=1000)
 
-        AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 1, 0.1)
+        AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 100, 0.01, gpu_id=gpu_id)
 
         predictor = PredictorASE(
                     fdm,

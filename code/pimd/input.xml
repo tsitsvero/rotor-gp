@@ -3,13 +3,13 @@
 <!--    <properties stride='1' filename='out'>  [ step, potential{kilocal/mol} ] </properties>-->
     <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory>
   </output>
-  <total_steps> 100 </total_steps>
+  <total_steps> 20 </total_steps>
   <ffsocket mode='inet' name='mycalc' pbc='False'>
     <address>localhost</address>
     <port>10200</port>
   </ffsocket>
   <system>
-    <initialize nbeads='5'>
+    <initialize nbeads='10'>
       <file mode='ase'>  /home/qklmn/repos/structures/structures/new_systems/ktu_002.cif </file>
     </initialize>
     <forces>
