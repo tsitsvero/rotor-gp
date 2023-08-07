@@ -146,8 +146,8 @@ def make_client(i, gpu_id_list):
 
 from joblib import Parallel, delayed
 
-K = 10
-gpu_id_list = [0, 1, 2, 3, 4, 5, 2, 3, 0, 1]
+K = 8
+gpu_id_list = [0, 1, 2, 3, 4, 5, 6, 7]
 
 status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i, gpu_id_list) for i in range(0, K)) 
 
