@@ -584,23 +584,23 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
 
 
 
-# def test_performance(hparams, soap_params, AG_force_model, fdm):
+def test_performance(hparams, soap_params, AG_force_model, fdm):
 
-#         from fande.predict import PredictorASE
+        from fande.predict import PredictorASE
 
-#         AG_force_model.eval()
+        AG_force_model.eval()
 
-#         predictor = PredictorASE(
-#                 fdm,
-#                 AG_force_model,
-#                 # trainer_f,
-#                 hparams,
-#                 soap_params
-#         )
+        predictor = PredictorASE(
+                fdm,
+                AG_force_model,
+                # trainer_f,
+                hparams,
+                soap_params
+        )
 
-#         rmse_per_model, mae_per_model = predictor.test_errors(view_worst_atoms=True)
+        rmse_per_model, mae_per_model = predictor.test_errors(view_worst_atoms=True)
 
-#         return
+        return
 
 
 def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
@@ -625,7 +625,7 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
         AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 100, 0.01, gpu_id=gpu_id)
 
-        # test_performance(hparams, soap_params, AG_force_model, fdm) # check if working?
+        test_performance(hparams, soap_params, AG_force_model, fdm) # check if working?
 
         predictor = PredictorASE(
                     fdm,

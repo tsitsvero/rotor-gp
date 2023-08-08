@@ -32,7 +32,7 @@ import os
 import sys
 
 from ase.calculators.socketio import SocketClient, SocketIOCalculator
-from ase.io import read
+from ase.io import read,write
 from ase import units
 
 # from ase.calculators.lj import LennardJones
@@ -48,7 +48,9 @@ from prepare_model import prepare_fande_ase_calc
 # Define atoms object
 # atoms = read("init.xyz", index='0', format='extxyz')
 # atoms = read(' ../../../structures/structures/new_systems/ktu_002.xyz')
-atoms = read('/home/qklmn/repos/structures/structures/new_systems/ktu_002.cif')
+
+# atoms = read('/home/qklmn/repos/structures/structures/new_systems/ktu_002.cif')
+atoms = read('/home/qklmn/data/starting_configuration/1.cif') # atoms specified here should be the same as in i-pi input file (otherwise atomic order differ, structure blows up!)
 atoms = AtomsWrapped(atoms)
 
 
@@ -61,12 +63,11 @@ atoms = AtomsWrapped(atoms)
 #                     atoms=atoms,
 #                     kT=0.1)
 
-
 import os
-# os.environ['OMP_NUM_THREADS'] = "6,1"
-# os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; dftb+ > PREFIX.out"
-# os.environ["DFTB_PREFIX"] = "/home/dlbox2/ダウンロード/pbc-0-3"
-
+os.environ['OMP_NUM_THREADS'] = "6,1"
+os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; /usr/local/dftbplus-21.2/bin/dftb+ > PREFIX.out"
+# os.environ["ASE_DFTB_COMMAND"] = "dftb+ > PREFIX.out"
+os.environ["DFTB_PREFIX"] = "/home/qklmn/data/dftb/pbc-0-3"
 
 # Hyperparameters:
 hparams = {
@@ -107,13 +108,13 @@ def make_client(i, gpu_id_list):
     # calc = Dftb(atoms=atoms_copy,
     #             label='crystal',
     #             # Hamiltonian_ = "xTB",
-    #             # Hamiltonian_Method = "GFN1-xTB",
-    #         #     Hamiltonian_MaxAngularMomentum_='',
-    #         #     Hamiltonian_MaxAngularMomentum_O='p',
-    #         #     Hamiltonian_MaxAngularMomentum_H='s',
-    #         #     Hamiltonian_MaxAngularMomentum_N='s',
-    #         #     Hamiltonian_MaxAngularMomentum_C='s',
-    #         #     Hamiltonian_MaxAngularMomentum_Si='s',
+    #             # # Hamiltonian_Method = "GFN1-xTB",
+    #             # Hamiltonian_MaxAngularMomentum_='',
+    #             # Hamiltonian_MaxAngularMomentum_O='p',
+    #             # Hamiltonian_MaxAngularMomentum_H='s',
+    #             # Hamiltonian_MaxAngularMomentum_N='s',
+    #             # Hamiltonian_MaxAngularMomentum_C='s',
+    #             # Hamiltonian_MaxAngularMomentum_Si='s',
     #             kpts=(1,1,1),
     #             # Hamiltonian_SCC='Yes',
     #             # Verbosity=0,
@@ -132,7 +133,10 @@ def make_client(i, gpu_id_list):
 
     atoms_copy.set_calculator(calc)
 
+    print( atoms_copy.get_potential_energy() )
+
     print("Calculator is set up!")
+    # print( atoms_copy.get_forces() )
     # Create Client
     # inet
     port = 10200
@@ -147,7 +151,7 @@ def make_client(i, gpu_id_list):
 from joblib import Parallel, delayed
 
 K = 8
-gpu_id_list = [0, 1, 2, 3, 4, 5, 6, 7]
+gpu_id_list = [0, 1, 2, 3, 4, 5, 6, 7] 
 
 status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i, gpu_id_list) for i in range(0, K)) 
 

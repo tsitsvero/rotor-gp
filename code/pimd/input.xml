@@ -4,13 +4,13 @@
     <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory>
   </output>
   <total_steps> 10000 </total_steps>
-  <ffsocket mode='inet' name='mycalc' pbc='False'>
+  <ffsocket mode='inet' name='mycalc' pbc='True'>
     <address>localhost</address>
     <port>10200</port>
   </ffsocket>
   <system>
     <initialize nbeads='8'>
-      <file mode='ase'>  /home/qklmn/repos/structures/structures/new_systems/ktu_002.cif </file>
+      <file mode='ase'>  /home/qklmn/data/starting_configuration/1.cif </file>
     </initialize>
     <forces>
       <force forcefield='mycalc'> </force>
@@ -20,9 +20,9 @@
     </ensemble>
     <motion mode='dynamics'>
       <dynamics mode='nvt'>
-        <timestep units='femtosecond'> 0.25 </timestep>
-        <thermostat mode='langevin'>
-          <tau units='femtosecond'>100</tau>
+        <timestep units='femtosecond'> 0.2 </timestep>
+        <thermostat mode='pile_g'>
+          <tau units='femtosecond'>25</tau>
         </thermostat>
       </dynamics>
     </motion>
