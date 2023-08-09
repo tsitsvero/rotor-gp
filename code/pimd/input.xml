@@ -1,9 +1,14 @@
 <simulation verbosity='high'>
   <output prefix='PREFIX'>
 <!--    <properties stride='1' filename='out'>  [ step, potential{kilocal/mol} ] </properties>-->
-    <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory>
+    <!-- <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory> -->
+    <!-- <properties stride="10"> [ step, time, pot_component_raw(0), pot_component_raw(1), temperature, conserved ] </properties> -->
+    <properties stride="10"> [ step, time, potential(0), temperature, conserved ] </properties>
+    <trajectory stride="10" filename="pos"> positions{angstrom} </trajectory>
+    <trajectory stride="10" filename="frc"> forces </trajectory>
+    <checkpoint stride="1000" overwrite="False"/>
   </output>
-  <total_steps> 10000 </total_steps>
+  <total_steps> 2000 </total_steps>
   <ffsocket mode='inet' name='mycalc' pbc='True'>
     <address>localhost</address>
     <port>10200</port>
@@ -20,9 +25,9 @@
     </ensemble>
     <motion mode='dynamics'>
       <dynamics mode='nvt'>
-        <timestep units='femtosecond'> 0.2 </timestep>
-        <thermostat mode='pile_g'>
-          <tau units='femtosecond'>25</tau>
+        <timestep units='femtosecond'> 0.5 </timestep>
+        <thermostat mode='langevin'>
+          <tau units='femtosecond'>100</tau>
         </thermostat>
       </dynamics>
     </motion>

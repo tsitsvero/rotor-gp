@@ -619,9 +619,9 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
         from fande.ase import FandeCalc
 
 
-        fdm = prepare_data(hparams, soap_params, traj_sample_rate=2)
+        fdm = prepare_data(hparams, soap_params, traj_sample_rate=1)
 
-        train_data_loaders = sample_data(fdm, N_samples=5_000)
+        train_data_loaders = sample_data(fdm, N_samples=6_000)
 
         AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 100, 0.01, gpu_id=gpu_id)
 

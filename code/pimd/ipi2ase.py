@@ -1,6 +1,7 @@
-#!/bin/python
+###!/bin/env python
 import numpy as np                                                                                                                                                                                  
-from ase.io import read,write                                                                                                                                                                       
+from ase.io import read,write
+from ase.units import Bohr                                                                                                                                                                       
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -9,6 +10,7 @@ parser.add_argument("outfile", help="output ASE style extended xyz", type=str)
 args = parser.parse_args()
 
 infile = args.infile
+outfile = args.outfile
 traj = read(infile,':')                                                                                                                                                              
 cells = [] 
 with open(infile) as f: 
@@ -16,7 +18,7 @@ with open(infile) as f:
         if '#' in l: 
             c = l.strip().split(' ') 
             c = np.array([x for x in c if x.strip()][2:8]) 
-            c = np.array([float(x) for x in c]) 
+            c = np.array([float(x) for x in c]) * Bohr
             cells.append(c) 
 for ifrm,frm in enumerate(traj): 
     frm.set_pbc(True) 
