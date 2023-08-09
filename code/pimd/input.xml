@@ -3,18 +3,18 @@
 <!--    <properties stride='1' filename='out'>  [ step, potential{kilocal/mol} ] </properties>-->
     <!-- <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory> -->
     <!-- <properties stride="10"> [ step, time, pot_component_raw(0), pot_component_raw(1), temperature, conserved ] </properties> -->
-    <properties stride="10"> [ step, time, potential(0), temperature, conserved ] </properties>
-    <trajectory stride="10" filename="pos"> positions{angstrom} </trajectory>
-    <trajectory stride="10" filename="frc"> forces </trajectory>
+    <properties stride="1"> [ step, time, potential(0), temperature, conserved ] </properties>
+    <trajectory stride="1" filename="pos"> positions{angstrom} </trajectory>
+    <trajectory stride="1" filename="frc"> forces </trajectory>
     <checkpoint stride="1000" overwrite="False"/>
   </output>
-  <total_steps> 2000 </total_steps>
+  <total_steps> 20000 </total_steps>
   <ffsocket mode='inet' name='mycalc' pbc='True'>
     <address>localhost</address>
     <port>10200</port>
   </ffsocket>
   <system>
-    <initialize nbeads='8'>
+    <initialize nbeads='16'>
       <file mode='ase'>  /home/qklmn/data/starting_configuration/1.cif </file>
     </initialize>
     <forces>

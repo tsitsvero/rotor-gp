@@ -80,11 +80,11 @@ hparams = {
 soap_params = {
 # 'species': ["H", "C", "O", "N", "Si"],
 # 'periodic': True,
-'interaction_cutoff': 3.0,
+'interaction_cutoff': 5.0,
 'gaussian_sigma_constant': 0.3,
-'max_radial': 4,
-'max_angular': 4,
-'cutoff_smooth_width': 0.1,
+'max_radial': 5,
+'max_angular': 5,
+'cutoff_smooth_width': 0.5,
 # 'average': "off",
 # 'crossover': True,
 # 'dtype': "float64",
@@ -150,8 +150,8 @@ def make_client(i, gpu_id_list):
 
 from joblib import Parallel, delayed
 
-K = 8
-gpu_id_list = [0, 1, 2, 3, 4, 5, 6, 7] 
+K = 16
+gpu_id_list = [0, 1, 2, 3, 4, 5, 6, 7] * 2
 
 status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i, gpu_id_list) for i in range(0, K)) 
 
