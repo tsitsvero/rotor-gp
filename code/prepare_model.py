@@ -100,11 +100,14 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
 
         # for parameter selection purpose:
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
-        traj_train = traj_2100[100:500]
+        traj_train = traj_2100[100:500].copy()
         # traj_train = traj_2100.copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
-        traj_train = traj_train[100:500:traj_sample_rate].copy()
+        # print("Length of the train trajectory: ", len(traj_train))
+        # traj_train = traj_train[100:500:2].copy()
+        print("Length of the train trajectory: ", len(traj_train))
+
 
         traj_test = traj_300[400:420].copy()
         # test_indices = np.sort(  np.random.choice(np.arange(0,92795), 200, replace=False) ) 
@@ -257,7 +260,17 @@ def sample_data(fdm, N_samples):
 
 def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_rate, gpu_id):
 
-        lr = learning_rate
+        # lr = learning_rate
+
+        if type(n_steps) is list:
+                n_steps_list = n_steps
+        else:
+                n_steps_list = [n_steps] * 14
+
+        if type(learning_rate) is list:
+                lr_list = learning_rate
+        else:
+                lr_list = [learning_rate] * 14
 
         import logging
 
@@ -267,8 +280,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_H_1,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[0],
+        'learning_rate' : lr_list[0],
         'soap_dim' : train_data_loaders[0].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -277,8 +290,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_H_2,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[1],
+        'learning_rate' : lr_list[1],
         'soap_dim' : train_data_loaders[1].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -287,8 +300,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_H_3,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[2],
+        'learning_rate' : lr_list[2],
         'soap_dim' : train_data_loaders[2].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -297,8 +310,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_H_4,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[3],
+        'learning_rate' : lr_list[3],
         'soap_dim' : train_data_loaders[3].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -309,8 +322,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_C_1,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[4],
+        'learning_rate' : lr_list[4],
         'soap_dim' : train_data_loaders[4].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -319,8 +332,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_C_2,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[5],
+        'learning_rate' : lr_list[5],
         'soap_dim' : train_data_loaders[5].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -329,8 +342,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_C_3,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[6],
+        'learning_rate' : lr_list[6],
         'soap_dim' : train_data_loaders[6].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -339,8 +352,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_C_4,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[7],
+        'learning_rate' : lr_list[7],
         'soap_dim' : train_data_loaders[7].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -349,8 +362,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_C_5,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[8],
+        'learning_rate' : lr_list[8],
         'soap_dim' : train_data_loaders[8].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -359,8 +372,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_C_6,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[9],
+        'learning_rate' : lr_list[9],
         'soap_dim' : train_data_loaders[9].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -369,8 +382,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_C_7,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[10],
+        'learning_rate' : lr_list[10],
         'soap_dim' : train_data_loaders[10].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -382,8 +395,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_N_1,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[11],
+        'learning_rate' : lr_list[11],
         'soap_dim' : train_data_loaders[11].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -394,8 +407,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_O_1,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[12],
+        'learning_rate' : lr_list[12],
         'soap_dim' : train_data_loaders[12].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -407,8 +420,8 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         'atomic_group' : ind_Si_1,
         'dtype' : hparams['dtype'],
         'device' : hparams['device'],
-        'num_epochs' : n_steps,
-        'learning_rate' : lr,
+        'num_epochs' : n_steps_list[13],
+        'learning_rate' : lr_list[13],
         'soap_dim' : train_data_loaders[13].dataset[0][0].shape[-1],
         'soap_params' : soap_params,
         }
@@ -623,7 +636,7 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
         train_data_loaders = sample_data(fdm, N_samples=6_000)
 
-        AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 100, 0.01, gpu_id=gpu_id)
+        AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
 
         test_performance(hparams, soap_params, AG_force_model, fdm) # check if working?
 
