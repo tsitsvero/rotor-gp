@@ -4,11 +4,12 @@
     <!-- <trajectory stride='1' filename='pos'>  positions{angstrom}  </trajectory> -->
     <!-- <properties stride="10"> [ step, time, pot_component_raw(0), pot_component_raw(1), temperature, conserved ] </properties> -->
     <properties stride="1"> [ step, time, potential(0), temperature, conserved ] </properties>
-    <trajectory stride="1" filename="pos"> positions{angstrom} </trajectory>
+    <trajectory stride="1" filename="pos" cell_units="angstrom"> positions{angstrom} </trajectory>
+    <trajectory stride="1" filename="pos_centroid" cell_units="angstrom"> x_centroid{angstrom} </trajectory>
     <trajectory stride="1" filename="frc"> forces </trajectory>
     <checkpoint stride="1000" overwrite="False"/>
   </output>
-  <total_steps> 20000 </total_steps>
+  <total_steps> 10000 </total_steps>
   <ffsocket mode='inet' name='mycalc' pbc='True'>
     <address>localhost</address>
     <port>10200</port>

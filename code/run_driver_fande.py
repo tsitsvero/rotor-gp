@@ -15,8 +15,15 @@ class AtomsWrapped(Atoms):
     def __init__(self, *args, **kwargs):
         super(AtomsWrapped, self).__init__(*args, **kwargs)      
         self.calc_history_counter = 0
+    
+    def get_forces_variance(self):
+        forces_variance = super(AtomsWrapped, self).calc.get_forces_variance(self)
+        return forces_variance
+
     def get_forces(self):       
         forces = super(AtomsWrapped, self).get_forces()
+        forces_variance = super(AtomsWrapped, self).calc.get_forces_variance(self)
+        self.arrays['forces_variance'] = forces_variance
         # energy = super(AtomsWrapped, self).get_potential_energy()
         from ase.io import write
         import os
@@ -51,7 +58,6 @@ from prepare_model import prepare_fande_ase_calc
 
 # atoms = read('/home/qklmn/repos/structures/structures/new_systems/ktu_002.cif')
 atoms = read('/home/qklmn/data/starting_configuration/1.cif') # atoms specified here should be the same as in i-pi input file (otherwise atomic order differ, structure blows up!)
-atoms = AtomsWrapped(atoms)
 
 
 
@@ -80,10 +86,10 @@ hparams = {
 soap_params = {
 # 'species': ["H", "C", "O", "N", "Si"],
 # 'periodic': True,
-'interaction_cutoff': 5.0,
+'interaction_cutoff': 5.0, #5
 'gaussian_sigma_constant': 0.3,
-'max_radial': 5,
-'max_angular': 5,
+'max_radial': 5, #5
+'max_angular': 5,#5
 'cutoff_smooth_width': 0.5,
 # 'average': "off",
 # 'crossover': True,
@@ -100,11 +106,15 @@ def make_client(i, gpu_id_list):
     os.makedirs("results/temp/temp_calc_dir_" + str(i), exist_ok=True)
     os.chdir("results/temp/temp_calc_dir_" + str(i))
 
-    fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
-    calc = fande_calc
-
     atoms_copy = atoms.copy()
 
+
+    atoms_copy = AtomsWrapped(atoms_copy)
+    fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
+    calc = fande_calc
+   
+
+    # https://dftb.org/parameters/download/3ob/3ob-3-1-cc
     # calc = Dftb(atoms=atoms_copy,
     #             label='crystal',
     #             # Hamiltonian_ = "xTB",
@@ -152,6 +162,7 @@ from joblib import Parallel, delayed
 
 K = 16
 gpu_id_list = [0, 1, 2, 3, 4, 5, 6, 7] * 2
+# K=1
 
 status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i, gpu_id_list) for i in range(0, K)) 
 
