@@ -10,29 +10,32 @@
 # https://gitlab.com/Sucerquia/ase-plumed_tutorial
 # https://dftbplus-recipes.readthedocs.io/en/latest/interfaces/ipi/ipi.html
 
-from ase import Atoms
-class AtomsWrapped(Atoms):   
-    def __init__(self, *args, **kwargs):
-        super(AtomsWrapped, self).__init__(*args, **kwargs)      
-        self.calc_history_counter = 0
+# from ase import Atoms
+# class FandeAtomsWrapper(Atoms):   
+#     def __init__(self, *args, **kwargs):
+#         super(FandeAtomsWrapper, self).__init__(*args, **kwargs)      
+#         self.calc_history_counter = 0
+#         self.request_variance = False
     
-    def get_forces_variance(self):
-        forces_variance = super(AtomsWrapped, self).calc.get_forces_variance(self)
-        return forces_variance
+#     def get_forces_variance(self):
+#         forces_variance = super(FandeAtomsWrapper, self).calc.get_forces_variance(self)
+#         return forces_variance
 
-    def get_forces(self):       
-        forces = super(AtomsWrapped, self).get_forces()
-        forces_variance = super(AtomsWrapped, self).calc.get_forces_variance(self)
-        self.arrays['forces_variance'] = forces_variance
-        # energy = super(AtomsWrapped, self).get_potential_energy()
-        from ase.io import write
-        import os
-        os.makedirs("ase_calc_history" , exist_ok=True)
-        write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
-        # self.calc_history.append(self.copy())       
-        self.calc_history_counter += 1
-        return forces
+#     def get_forces(self):       
+#         forces = super(FandeAtomsWrapper, self).get_forces()
+#         if self.request_variance:
+#             forces_variance = super(FandeAtomsWrapper, self).calc.get_forces_variance(self)
+#             self.arrays['forces_variance'] = forces_variance
+#         # energy = super(AtomsWrapped, self).get_potential_energy()
+#         from ase.io import write
+#         import os
+#         os.makedirs("ase_calc_history" , exist_ok=True)
+#         write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
+#         # self.calc_history.append(self.copy())       
+#         self.calc_history_counter += 1
+#         return forces
     
+
 
 
 import os
@@ -49,7 +52,8 @@ from ase.calculators.dftb import Dftb
 
 import sys
 # sys.path.append("../") 
-from prepare_model import prepare_fande_ase_calc 
+from prepare_model import prepare_fande_ase_calc
+from fande.ase import FandeAtomsWrapper 
 
 
 # Define atoms object
@@ -103,43 +107,50 @@ import sys
 sys.path.append("../../fande")
 
 def make_client(i, gpu_id_list):
-    os.makedirs("results/temp/temp_calc_dir_" + str(i), exist_ok=True)
-    os.chdir("results/temp/temp_calc_dir_" + str(i))
+    temp_dir = "results/temp/temp_calc_dir_" + str(i)
+    os.makedirs(temp_dir, exist_ok=True)
+    os.chdir(temp_dir)
+    # for file in os.scandir(temp_dir):
+    #     os.remove(file.path)
+
 
     atoms_copy = atoms.copy()
 
 
-    atoms_copy = AtomsWrapped(atoms_copy)
-    fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
-    calc = fande_calc
+    # atoms_copy = FandeAtomsWrapper(atoms_copy, request_uncertainties=True)
+    # atoms_copy.request_uncertainties = True
+    # fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
+    # calc = fande_calc
    
 
     # https://dftb.org/parameters/download/3ob/3ob-3-1-cc
-    # calc = Dftb(atoms=atoms_copy,
-    #             label='crystal',
-    #             # Hamiltonian_ = "xTB",
-    #             # # Hamiltonian_Method = "GFN1-xTB",
-    #             # Hamiltonian_MaxAngularMomentum_='',
-    #             # Hamiltonian_MaxAngularMomentum_O='p',
-    #             # Hamiltonian_MaxAngularMomentum_H='s',
-    #             # Hamiltonian_MaxAngularMomentum_N='s',
-    #             # Hamiltonian_MaxAngularMomentum_C='s',
-    #             # Hamiltonian_MaxAngularMomentum_Si='s',
-    #             kpts=(1,1,1),
-    #             # Hamiltonian_SCC='Yes',
-    #             # Verbosity=0,
-    #             # Hamiltonian_OrbitalResolvedSCC = 'Yes',
-    #             # Hamiltonian_SCCTolerance=1e-15,
-    #             # kpts=None,
-    #             # Driver_='ConjugateGradient',
-    #             # Driver_MaxForceComponent=1e-3,
-    #             # Driver_MaxSteps=200,
-    #             # Driver_LatticeOpt = 'Yes',
-    #         #     Driver_AppendGeometries = 'Yes',
-    #         #     Driver_='',
-    #         #     Driver_Socket_='',
-    #         #     Driver_Socket_File='Hello'
-    #             )
+    atoms_copy = FandeAtomsWrapper(atoms_copy)
+    atoms_copy.request_variance = False
+    calc = Dftb(atoms=atoms_copy,
+                label='crystal',
+                # Hamiltonian_ = "xTB",
+                # # Hamiltonian_Method = "GFN1-xTB",
+                # Hamiltonian_MaxAngularMomentum_='',
+                # Hamiltonian_MaxAngularMomentum_O='p',
+                # Hamiltonian_MaxAngularMomentum_H='s',
+                # Hamiltonian_MaxAngularMomentum_N='s',
+                # Hamiltonian_MaxAngularMomentum_C='s',
+                # Hamiltonian_MaxAngularMomentum_Si='s',
+                kpts=(1,1,1),
+                # Hamiltonian_SCC='Yes',
+                # Verbosity=0,
+                # Hamiltonian_OrbitalResolvedSCC = 'Yes',
+                # Hamiltonian_SCCTolerance=1e-15,
+                # kpts=None,
+                # Driver_='ConjugateGradient',
+                # Driver_MaxForceComponent=1e-3,
+                # Driver_MaxSteps=200,
+                # Driver_LatticeOpt = 'Yes',
+            #     Driver_AppendGeometries = 'Yes',
+            #     Driver_='',
+            #     Driver_Socket_='',
+            #     Driver_Socket_File='Hello'
+                )
 
     atoms_copy.set_calculator(calc)
 
