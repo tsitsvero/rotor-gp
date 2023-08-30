@@ -74,7 +74,7 @@ atoms = read('/home/qklmn/data/starting_configuration/1.cif') # atoms specified 
 #                     kT=0.1)
 
 import os
-os.environ['OMP_NUM_THREADS'] = "3,1"
+os.environ['OMP_NUM_THREADS'] = "5,1"
 os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; /usr/local/dftbplus-21.2/bin/dftb+ > PREFIX.out"
 # os.environ["ASE_DFTB_COMMAND"] = "dftb+ > PREFIX.out"
 os.environ["DFTB_PREFIX"] = "/home/qklmn/data/dftb/pbc-0-3"
@@ -106,20 +106,12 @@ soap_params = {
 import sys
 sys.path.append("../../fande")
 
-def make_client(i, gpu_id_list):
-    pimd_dirname = os.environ.get('PIMD_DIR')
-    if pimd_dirname is None:
-        pimd_dirname = 'output_pimd'
-    temp_dir = "pimd/" + pimd_dirname + "/calc_" + str(i)
+def make_client(i, gpu_id_list, prefix='dftb_good_1_'):
+    temp_dir = "results/temp/" + prefix + str(i)
     os.makedirs(temp_dir, exist_ok=True)
     os.chdir(temp_dir)
     # for file in os.scandir(temp_dir):
     #     os.remove(file.path)
-
-
-    pimd_port = int(os.environ.get('PIMD_PORT'))
-    if pimd_port is None:
-        pimd_port = 10210
 
 
     atoms_copy = atoms.copy()
@@ -168,8 +160,7 @@ def make_client(i, gpu_id_list):
     # print( atoms_copy.get_forces() )
     # Create Client
     # inet
-    print(f"Launchine fande client at port {pimd_port}")
-    port = pimd_port
+    port = 10201
     host = "localhost"
     client = SocketClient(host=host, port=port)
     client.run(atoms_copy)

@@ -15,7 +15,7 @@
     <port>10200</port>
   </ffsocket>
   <system>
-    <initialize nbeads='16'>
+    <initialize nbeads='1'>
       <file mode='ase'>  /home/qklmn/data/starting_configuration/1.cif </file>
       <velocities mode="thermal" units="kelvin"> 20 </velocities>
     </initialize>
