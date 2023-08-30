@@ -170,3 +170,4 @@ code/pimd/temp/*
 results/train_and_run/*
 code/results/*
 code/pimd/output/*
+code/pimd/output_*/*

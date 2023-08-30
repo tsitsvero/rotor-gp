@@ -17,6 +17,7 @@
   <system>
     <initialize nbeads='16'>
       <file mode='ase'>  /home/qklmn/data/starting_configuration/1.cif </file>
+      <velocities mode="thermal" units="kelvin"> 20 </velocities>
     </initialize>
     <forces>
       <force forcefield='mycalc'> </force>

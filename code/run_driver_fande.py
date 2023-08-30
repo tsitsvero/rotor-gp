@@ -51,7 +51,7 @@ from ase.calculators.dftb import Dftb
 
 
 import sys
-# sys.path.append("../") 
+sys.path.append("../../fande")
 from prepare_model import prepare_fande_ase_calc
 from fande.ase import FandeAtomsWrapper 
 
@@ -74,7 +74,7 @@ atoms = read('/home/qklmn/data/starting_configuration/1.cif') # atoms specified 
 #                     kT=0.1)
 
 import os
-os.environ['OMP_NUM_THREADS'] = "6,1"
+os.environ['OMP_NUM_THREADS'] = "2,1"
 os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; /usr/local/dftbplus-21.2/bin/dftb+ > PREFIX.out"
 # os.environ["ASE_DFTB_COMMAND"] = "dftb+ > PREFIX.out"
 os.environ["DFTB_PREFIX"] = "/home/qklmn/data/dftb/pbc-0-3"
@@ -106,8 +106,8 @@ soap_params = {
 import sys
 sys.path.append("../../fande")
 
-def make_client(i, gpu_id_list):
-    temp_dir = "results/temp/temp_calc_dir_" + str(i)
+def make_client(i, gpu_id_list, prefix='single_bead_'):
+    temp_dir = "results/temp/" + prefix + str(i)
     os.makedirs(temp_dir, exist_ok=True)
     os.chdir(temp_dir)
     # for file in os.scandir(temp_dir):
@@ -127,30 +127,30 @@ def make_client(i, gpu_id_list):
     atoms_copy = FandeAtomsWrapper(atoms_copy)
     atoms_copy.request_variance = False
     calc = Dftb(atoms=atoms_copy,
-                label='crystal',
-                # Hamiltonian_ = "xTB",
-                # # Hamiltonian_Method = "GFN1-xTB",
-                # Hamiltonian_MaxAngularMomentum_='',
-                # Hamiltonian_MaxAngularMomentum_O='p',
-                # Hamiltonian_MaxAngularMomentum_H='s',
-                # Hamiltonian_MaxAngularMomentum_N='s',
-                # Hamiltonian_MaxAngularMomentum_C='s',
-                # Hamiltonian_MaxAngularMomentum_Si='s',
-                kpts=(1,1,1),
-                # Hamiltonian_SCC='Yes',
-                # Verbosity=0,
-                # Hamiltonian_OrbitalResolvedSCC = 'Yes',
-                # Hamiltonian_SCCTolerance=1e-15,
-                # kpts=None,
-                # Driver_='ConjugateGradient',
-                # Driver_MaxForceComponent=1e-3,
-                # Driver_MaxSteps=200,
-                # Driver_LatticeOpt = 'Yes',
+            label='crystal',
+            # Hamiltonian_ = "xTB",
+            # # Hamiltonian_Method = "GFN1-xTB",
+            Hamiltonian_MaxAngularMomentum_='',
+            Hamiltonian_MaxAngularMomentum_H='s',
+            Hamiltonian_MaxAngularMomentum_O='p',
+            Hamiltonian_MaxAngularMomentum_N='p',
+            Hamiltonian_MaxAngularMomentum_C='p',
+            Hamiltonian_MaxAngularMomentum_Si='d',
+            kpts=(2,1,1),
+            Hamiltonian_SCC='Yes',
+            # Verbosity=0,
+            # Hamiltonian_OrbitalResolvedSCC = 'Yes',
+            # Hamiltonian_SCCTolerance=1e-15,
+            # kpts=None,
+            # Driver_='ConjugateGradient',
+            # Driver_MaxForceComponent=1e-3,
+            # Driver_MaxSteps=200,
+            # Driver_LatticeOpt = 'Yes',
             #     Driver_AppendGeometries = 'Yes',
             #     Driver_='',
             #     Driver_Socket_='',
             #     Driver_Socket_File='Hello'
-                )
+            )
 
     atoms_copy.set_calculator(calc)
 
