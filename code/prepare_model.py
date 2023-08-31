@@ -236,20 +236,20 @@ def sample_data(fdm, N_samples):
         ]
 
         high_force_samples_per_group = [
-        0, # ind_H_1
-        0, # ind_H_2
-        0, # ind_H_3
-        0, # ind_H_4    
-        0, # ind_C_1
-        0, # ind_C_2
-        0, # ind_C_3
-        0, # ind_C_4
-        0, # ind_C_5
-        0, # ind_C_6
-        0, # ind_C_7
-        0, # ind_N_1
-        0, # ind_O_1
-        0, # ind_Si_1
+        1000, # ind_H_1
+        1000, # ind_H_2
+        1000, # ind_H_3
+        1000, # ind_H_4    
+        1000, # ind_C_1
+        1000, # ind_C_2
+        1000, # ind_C_3
+        1000, # ind_C_4
+        1000, # ind_C_5
+        1000, # ind_C_6
+        1000, # ind_C_7
+        1000, # ind_N_1
+        1000, # ind_O_1
+        1000, # ind_Si_1
         ]
 
         train_data_loaders = fdm.prepare_train_data_loaders(
@@ -639,7 +639,7 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
         fdm = prepare_data(hparams, soap_params, traj_sample_rate=1)
 
-        train_data_loaders = sample_data(fdm, N_samples=6_000)
+        train_data_loaders = sample_data(fdm, N_samples=7_200)
 
         AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
 

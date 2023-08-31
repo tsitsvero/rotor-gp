@@ -90,11 +90,11 @@ hparams = {
 soap_params = {
 # 'species': ["H", "C", "O", "N", "Si"],
 # 'periodic': True,
-'interaction_cutoff': 5.0, #5
+'interaction_cutoff': 3.5, #5
 'gaussian_sigma_constant': 0.3,
-'max_radial': 5, #5
-'max_angular': 5,#5
-'cutoff_smooth_width': 0.5,
+'max_radial': 4, #5
+'max_angular': 4,#5
+'cutoff_smooth_width': 0.1,
 # 'average': "off",
 # 'crossover': True,
 # 'dtype': "float64",
@@ -109,7 +109,7 @@ sys.path.append("../../fande")
 def make_client(i, gpu_id_list):
     pimd_dirname = os.environ.get('PIMD_DIR')
     if pimd_dirname is None:
-        pimd_dirname = 'output_pimd'
+        pimd_dirname = 'output_ml_1' ############### specify correctly!!!!!
     temp_dir = "pimd/" + pimd_dirname + "/calc_" + str(i)
     os.makedirs(temp_dir, exist_ok=True)
     os.chdir(temp_dir)
@@ -117,48 +117,49 @@ def make_client(i, gpu_id_list):
     #     os.remove(file.path)
 
 
-    pimd_port = int(os.environ.get('PIMD_PORT'))
-    if pimd_port is None:
-        pimd_port = 10210
+    if os.environ.get('PIMD_PORT') is not None:
+        pimd_port = int(os.environ.get('PIMD_PORT'))
+    else:
+        pimd_port = 10200
 
 
     atoms_copy = atoms.copy()
 
 
-    # atoms_copy = FandeAtomsWrapper(atoms_copy, request_uncertainties=True)
-    # atoms_copy.request_uncertainties = True
-    # fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
-    # calc = fande_calc
+    atoms_copy = FandeAtomsWrapper(atoms_copy)
+    atoms_copy.request_uncertainties = True
+    fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
+    calc = fande_calc
    
 
     # https://dftb.org/parameters/download/3ob/3ob-3-1-cc
-    atoms_copy = FandeAtomsWrapper(atoms_copy)
-    atoms_copy.request_variance = False
-    calc = Dftb(atoms=atoms_copy,
-            label='crystal',
-            # Hamiltonian_ = "xTB",
-            # # Hamiltonian_Method = "GFN1-xTB",
-            Hamiltonian_MaxAngularMomentum_='',
-            Hamiltonian_MaxAngularMomentum_H='s',
-            Hamiltonian_MaxAngularMomentum_O='p',
-            Hamiltonian_MaxAngularMomentum_N='p',
-            Hamiltonian_MaxAngularMomentum_C='p',
-            Hamiltonian_MaxAngularMomentum_Si='d',
-            kpts=(2,1,1),
-            Hamiltonian_SCC='Yes',
-            # Verbosity=0,
-            # Hamiltonian_OrbitalResolvedSCC = 'Yes',
-            # Hamiltonian_SCCTolerance=1e-15,
-            # kpts=None,
-            # Driver_='ConjugateGradient',
-            # Driver_MaxForceComponent=1e-3,
-            # Driver_MaxSteps=200,
-            # Driver_LatticeOpt = 'Yes',
-            #     Driver_AppendGeometries = 'Yes',
-            #     Driver_='',
-            #     Driver_Socket_='',
-            #     Driver_Socket_File='Hello'
-            )
+    # atoms_copy = FandeAtomsWrapper(atoms_copy)
+    # atoms_copy.request_variance = False
+    # calc = Dftb(atoms=atoms_copy,
+    #         label='crystal',
+    #         # Hamiltonian_ = "xTB",
+    #         # # Hamiltonian_Method = "GFN1-xTB",
+    #         Hamiltonian_MaxAngularMomentum_='',
+    #         Hamiltonian_MaxAngularMomentum_H='s',
+    #         Hamiltonian_MaxAngularMomentum_O='p',
+    #         Hamiltonian_MaxAngularMomentum_N='p',
+    #         Hamiltonian_MaxAngularMomentum_C='p',
+    #         Hamiltonian_MaxAngularMomentum_Si='d',
+    #         kpts=(2,1,1),
+    #         Hamiltonian_SCC='Yes',
+    #         # Verbosity=0,
+    #         # Hamiltonian_OrbitalResolvedSCC = 'Yes',
+    #         # Hamiltonian_SCCTolerance=1e-15,
+    #         # kpts=None,
+    #         # Driver_='ConjugateGradient',
+    #         # Driver_MaxForceComponent=1e-3,
+    #         # Driver_MaxSteps=200,
+    #         # Driver_LatticeOpt = 'Yes',
+    #         #     Driver_AppendGeometries = 'Yes',
+    #         #     Driver_='',
+    #         #     Driver_Socket_='',
+    #         #     Driver_Socket_File='Hello'
+    #         )
 
     atoms_copy.set_calculator(calc)
 
