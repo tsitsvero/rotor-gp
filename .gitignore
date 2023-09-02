@@ -171,3 +171,4 @@ results/train_and_run/*
 code/results/*
 code/pimd/output/*
 code/pimd/output_*/*
+code/pimd/outout_ml_16/*

@@ -109,7 +109,7 @@ sys.path.append("../../fande")
 def make_client(i, gpu_id_list):
     pimd_dirname = os.environ.get('PIMD_DIR')
     if pimd_dirname is None:
-        pimd_dirname = 'output_ml_1' ############### specify correctly!!!!!
+        pimd_dirname = 'output_ml_16' ############### specify correctly!!!!!
     temp_dir = "pimd/" + pimd_dirname + "/calc_" + str(i)
     os.makedirs(temp_dir, exist_ok=True)
     os.chdir(temp_dir)
@@ -127,7 +127,7 @@ def make_client(i, gpu_id_list):
 
 
     atoms_copy = FandeAtomsWrapper(atoms_copy)
-    atoms_copy.request_uncertainties = True
+    atoms_copy.request_variance = True
     fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
     calc = fande_calc
    

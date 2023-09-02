@@ -103,9 +103,9 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
 
         # for parameter selection purpose:
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
-        traj_train = traj_dftb_2100[100:500].copy()
+        # traj_train = traj_dftb_2100[100:500].copy()
 
-        # traj_train = traj_2100.copy()
+        traj_train = traj_2100[100:500].copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
         # print("Length of the train trajectory: ", len(traj_train))
@@ -113,8 +113,8 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         print("Length of the train trajectory: ", len(traj_train))
 
 
-        # traj_test = traj_300[400:420].copy()
-        traj_test = traj_dftb_300[400:420].copy()
+        traj_test = traj_300[400:420].copy()
+        # traj_test = traj_dftb_300[400:420].copy()
         # test_indices = np.sort(  np.random.choice(np.arange(0,92795), 200, replace=False) ) 
         # test_indices = np.sort(  np.arange(400,410,1) ) 
         # traj_test = [traj_md[i] for i in test_indices]
