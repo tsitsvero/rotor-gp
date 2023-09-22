@@ -103,6 +103,57 @@ soap_params = {
 # 'positions': [7, 11, 15] # ignored
 }
 
+
+#### for rotors
+
+from ase import Atoms
+# from ase.io import write
+
+
+
+# import os
+import numpy as np
+
+axis_ring = [111,11]
+ring = [25, 27, 29, 31, 33, 35]
+class RotationAtomsWrapper(Atoms):   
+    def __init__(self, *args, **kwargs):
+        super(RotationAtomsWrapper, self).__init__(*args, **kwargs)      
+        self.calc_history_counter = 0
+        self.alpha = 0.5
+
+    def get_forces(self, md=False):       
+        forces = super(RotationAtomsWrapper, self).get_forces(md=md)
+        # energy = super(AtomsWrapped, self).get_potential_energy()
+        # os.makedirs("ase_calc_history" , exist_ok=True)
+        # write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
+        # self.calc_history.append(self.copy())       
+        # self.calc_history_counter += 1
+
+        axis_1_vector = self.positions[axis_ring[1]] - self.positions[axis_ring[0]]
+        axis_1_center = (self.positions[axis_ring[1]] + self.positions[axis_ring[0]]) / 2.0
+        rotor_1_relative_positions = self.positions[ring] - axis_1_center
+        rotor_1_cross_product = np.cross(rotor_1_relative_positions, axis_1_vector)
+
+        # axis_2_vector = self.positions[axis_bulk[1]] - self.positions[axis_bulk[0]]
+        # axis_2_center = (self.positions[axis_bulk[1]] + self.positions[axis_bulk[0]]) / 2.0
+        # rotor_2_relative_positions = self.positions[bulk_1 + bulk_2 + bulk_3] - axis_2_center
+        # rotor_2_cross_product = np.cross(rotor_2_relative_positions, axis_2_vector)
+
+
+        forces_torque_1 = rotor_1_cross_product * self.alpha
+        # forces_torque_2 = rotor_2_cross_product * self.alpha
+
+        forces[ring] += forces_torque_1
+        # forces[bulk_1 + bulk_2 + bulk_3] += -forces_torque_2
+        # forces[frozen_atoms] = np.zeros((len(frozen_atoms), 3))
+
+        return forces
+
+####
+
+
+
 import sys
 sys.path.append("../../fande")
 
@@ -126,40 +177,45 @@ def make_client(i, gpu_id_list):
     atoms_copy = atoms.copy()
 
 
-    atoms_copy = FandeAtomsWrapper(atoms_copy)
-    atoms_copy.request_variance = True
-    fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
-    calc = fande_calc
+    # atoms_copy = FandeAtomsWrapper(atoms_copy)
+    # atoms_copy.request_variance = True
+    # fande_calc = prepare_fande_ase_calc(hparams, soap_params, gpu_id = gpu_id_list[i])
+    # calc = fande_calc
    
 
+
+
+
+
     # https://dftb.org/parameters/download/3ob/3ob-3-1-cc
-    # atoms_copy = FandeAtomsWrapper(atoms_copy)
-    # atoms_copy.request_variance = False
-    # calc = Dftb(atoms=atoms_copy,
-    #         label='crystal',
-    #         # Hamiltonian_ = "xTB",
-    #         # # Hamiltonian_Method = "GFN1-xTB",
-    #         Hamiltonian_MaxAngularMomentum_='',
-    #         Hamiltonian_MaxAngularMomentum_H='s',
-    #         Hamiltonian_MaxAngularMomentum_O='p',
-    #         Hamiltonian_MaxAngularMomentum_N='p',
-    #         Hamiltonian_MaxAngularMomentum_C='p',
-    #         Hamiltonian_MaxAngularMomentum_Si='d',
-    #         kpts=(2,1,1),
-    #         Hamiltonian_SCC='Yes',
-    #         # Verbosity=0,
-    #         # Hamiltonian_OrbitalResolvedSCC = 'Yes',
-    #         # Hamiltonian_SCCTolerance=1e-15,
-    #         # kpts=None,
-    #         # Driver_='ConjugateGradient',
-    #         # Driver_MaxForceComponent=1e-3,
-    #         # Driver_MaxSteps=200,
-    #         # Driver_LatticeOpt = 'Yes',
-    #         #     Driver_AppendGeometries = 'Yes',
-    #         #     Driver_='',
-    #         #     Driver_Socket_='',
-    #         #     Driver_Socket_File='Hello'
-    #         )
+    atoms_copy = FandeAtomsWrapper(atoms_copy)
+    atoms_copy.request_variance = False
+    atoms_copy = RotationAtomsWrapper(atoms_copy)
+    calc = Dftb(atoms=atoms_copy,
+            label='crystal',
+            # Hamiltonian_ = "xTB",
+            # # Hamiltonian_Method = "GFN1-xTB",
+            Hamiltonian_MaxAngularMomentum_='',
+            Hamiltonian_MaxAngularMomentum_H='s',
+            Hamiltonian_MaxAngularMomentum_O='p',
+            Hamiltonian_MaxAngularMomentum_N='p',
+            Hamiltonian_MaxAngularMomentum_C='p',
+            Hamiltonian_MaxAngularMomentum_Si='d',
+            kpts=(1,1,1),
+            # Hamiltonian_SCC='Yes',
+            # Verbosity=0,
+            # Hamiltonian_OrbitalResolvedSCC = 'Yes',
+            # Hamiltonian_SCCTolerance=1e-15,
+            # kpts=None,
+            # Driver_='ConjugateGradient',
+            # Driver_MaxForceComponent=1e-3,
+            # Driver_MaxSteps=200,
+            # Driver_LatticeOpt = 'Yes',
+            #     Driver_AppendGeometries = 'Yes',
+            #     Driver_='',
+            #     Driver_Socket_='',
+            #     Driver_Socket_File='Hello'
+            )
 
     atoms_copy.set_calculator(calc)
 
@@ -183,7 +239,7 @@ from joblib import Parallel, delayed
 
 K = 16
 gpu_id_list = [0, 1, 2, 3, 4, 5, 6, 7] * 2
-K=1
+# K=1
 
 status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i, gpu_id_list) for i in range(0, K)) 
 
