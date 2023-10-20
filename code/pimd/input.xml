@@ -9,7 +9,7 @@
     <trajectory stride="1" filename="frc"> forces </trajectory>
     <checkpoint stride="1000" overwrite="False"/>
   </output>
-  <total_steps> 10000 </total_steps>
+  <total_steps> 1000 </total_steps>
   <ffsocket mode='inet' name='mycalc' pbc='True'>
     <address>localhost</address>
     <port>10200</port>
@@ -27,7 +27,7 @@
     </ensemble>
     <motion mode='dynamics'>
       <dynamics mode='nvt'>
-        <timestep units='femtosecond'> 0.25 </timestep>
+        <timestep units='femtosecond'> 0.5 </timestep>
         <thermostat mode='langevin'>
           <tau units='femtosecond'>10</tau>
         </thermostat>
