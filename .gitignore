@@ -172,3 +172,9 @@ code/results/*
 code/pimd/output/*
 code/pimd/output_*/*
 code/pimd/outout_ml_16/*
+code/pimd/caclulation_temp/*
+
+
+*PREFIX*
+*RESTART*
+

@@ -1,5 +1,5 @@
 # To run the server: i-pi input.xml > log &
-# To run the driver: python ./run_driver.py
+# To run the driver: python ./run_driver_fande.py --pimd_port 10200 --pimd_num_calcs 0
 
 # i-pi input.xml > log || python ./run_driver.py
 
@@ -35,6 +35,47 @@
 #         self.calc_history_counter += 1
 #         return forces
     
+# Import the library
+import argparse
+# Create the parser
+parser = argparse.ArgumentParser()
+# Add an argument
+
+parser.add_argument('--pimd_port', type=int, required=True)
+parser.add_argument('--pimd_num_calcs', type=int, required=True)
+
+# parser.add_argument('--calc_dir', type=str, required=True)
+# parser.add_argument('--vasp_command', type=str, required=True)
+# parser.add_argument('--vasp_pseudos_dir', type=str, required=True)
+# parser.add_argument('--traj_filename', type=str, required=True)
+# parser.add_argument('--log_filename', type=str, required=True)
+
+# parser.add_argument('--temperature', type=float, required=True)
+# parser.add_argument('--md_time_step', type=float, required=True)
+# parser.add_argument('--num_steps', type=int, required=True)
+# parser.add_argument('--friction', type=float, required=True)
+
+# # parser.add_argument('--rotors_list', type=list, required=True)
+# parser.add_argument('--forces_alpha', type=float, required=True, nargs="+")
+
+# parser.add_argument('--calculator', type=str, required=False, default="vasp")
+
+# parser.add_argument('--structure', type=str, required=True)
+
+# parser.add_argument('--moving_method', type=str, required=False, default="Langevin")
+
+# parser.add_argument('--relaxation_interval', type=int, required=True)
+# parser.add_argument('--rotation_angle', type=float, required=True)
+# Parse the argument
+args = parser.parse_args()
+
+
+PIMD_PORT = args.pimd_port
+PIMD_NUM_CALCS = args.pimd_num_calcs
+
+
+
+
 
 
 
@@ -49,11 +90,6 @@ from ase import units
 # from xtb.ase.calculator import XTB
 from ase.calculators.dftb import Dftb
 
-
-import sys
-sys.path.append("../../fande")
-from prepare_model import prepare_fande_ase_calc
-from fande.ase import FandeAtomsWrapper 
 
 
 # Define atoms object
@@ -74,12 +110,7 @@ from fande.ase import FandeAtomsWrapper
 #                     kT=0.1)
 
 import os
-os.environ['OMP_NUM_THREADS'] = "3,1"
-os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; /usr/local/dftbplus-21.2/bin/dftb+ > PREFIX.out"
-#with mpi
-# os.environ["ASE_DFTB_COMMAND"] = "source ~/.bashrc; mpirun -np 20 -ppn 1 dftb+-mpi > PREFIX.out"
-# os.environ["ASE_DFTB_COMMAND"] = "dftb+ > PREFIX.out"
-os.environ["DFTB_PREFIX"] = "/home/qklmn/data/dftb/pbc-0-3"
+
 
 # Hyperparameters:
 hparams = {
@@ -112,7 +143,8 @@ from ase import io
 STRUCTURE="295K"
 
 if STRUCTURE == "295K":
-    crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/295optdftb.cif"), format="cif" ) 
+    # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/295optdftb.cif"), format="cif" )
+    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/295Ksupercell.cif"), format="cif" ) 
     # 295 K structure:
     triazine_1 = [6, 8, 10, 102, 104, 106]
     triazine_2 = [9, 7, 11, 103, 105, 107]
@@ -206,7 +238,7 @@ elif STRUCTURE == "355K":
 else:
     RuntimeError("STRUCTURE must be among 295K and 355K")
 
-atoms = crystal
+atoms = crystal.copy()
 
 
 import numpy as np
@@ -217,9 +249,9 @@ class RotationAtomsWrapper(Atoms):
     def __init__(self, *args, **kwargs):
         super(RotationAtomsWrapper, self).__init__(*args, **kwargs)      
         self.calc_history_counter = 0
-        self.forces_alpha = [0.075, -0.075, -0.075, 0.075, -0.075, -0.075,   -0.075, 0.075, 0.075,  -0.075, 0.075, 0.075] #[0.05] * 12
+        self.forces_alpha = [0.0, -0.0, -0.0, 0.0, -0.0, -0.0,   -0.0, 0.0, 0.0,  -0.0, 0.0, 0.0] #[0.05] * 12
 
-    def get_forces(self, md=False):       
+    def get_forces(self, md=True):       
         forces = super(RotationAtomsWrapper, self).get_forces(md=md)
         # energy = super(AtomsWrapped, self).get_potential_energy()
         # os.makedirs("ase_calc_history" , exist_ok=True)
@@ -323,37 +355,43 @@ class RotationAtomsWrapper(Atoms):
 
 
 
-import sys
-sys.path.append("../../fande")
 
-# from xtb.ase.calculator import XTB
-from ase.calculators.gulp import GULP, Conditions
-os.environ["ASE_GULP_COMMAND"]="/home/qklmn/data/gulp/gulp-6.1.2/Src/gulp < PREFIX.gin > PREFIX.got"
+# import sys
+# sys.path.append("../../fande")
+# from prepare_model import prepare_fande_ase_calc
+# from fande.ase import FandeAtomsWrapper 
+
+from xtb.ase.calculator import XTB
+# from ase.calculators.gulp import GULP, Conditions
+# os.environ["ASE_GULP_COMMAND"]="/home/qklmn/data/gulp/gulp-6.1.2/Src/gulp < PREFIX.gin > PREFIX.got"
 # /home/qklmn/data/gulp/gulp-6.1.2/Libraries
-os.environ["GULP_LIB"] = "/home/qklmn/data/gulp/gulp-6.1.2/Libraries"
+# os.environ["GULP_LIB"] = "/home/qklmn/data/gulp/gulp-6.1.2/Libraries"
 
-# pimd_port_list = [10201] #+ [10232]*32
+os.environ['OMP_NUM_THREADS'] = "1,1"
+# os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; /usr/local/dftbplus-21.2/bin/dftb+ > PREFIX.out"
+# os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; mpirun -np 1 dftb+ > PREFIX.out"
+os.environ["ASE_DFTB_COMMAND"] = "ulimit -s unlimited; dftb+ > PREFIX.out"
+#with mpi
+# os.environ["ASE_DFTB_COMMAND"] = "source ~/.bashrc; mpirun -np 20 -ppn 1 dftb+-mpi > PREFIX.out"
+# os.environ["ASE_DFTB_COMMAND"] = "dftb+ > PREFIX.out"
+# os.environ["DFTB_PREFIX"] =  #"/home/qklmn/data/dftb/pbc-0-3"
+os.environ["DFTB_PREFIX"] = "/home/dlbox2/ダウンロード/pbc-0-3"
 
 def make_client(i, gpu_id_list):
     pimd_dirname = os.environ.get('PIMD_DIR')
     if pimd_dirname is None:
-        pimd_dirname = 'output_ml_16' ############### specify correctly!!!!!
-    temp_dir = "pimd/" + pimd_dirname + "/calc_" + str(i)
+        pimd_dirname = 'caclulation_temp' ############### specify correctly!!!!!
+    temp_dir = "pimd/" + pimd_dirname + "/calc_" + str(PIMD_PORT) + "_" + str(i)
     os.makedirs(temp_dir, exist_ok=True)
     os.chdir(temp_dir)
     # for file in os.scandir(temp_dir):
     #     os.remove(file.path)
 
 
-    if os.environ.get('PIMD_PORT') is not None:
-        pimd_port = int(os.environ.get('PIMD_PORT'))
-    else:
-        pimd_port = 10201
+    pimd_port = PIMD_PORT
         # pimd_port = pimd_port_list[i]
 
-
     atoms_copy = atoms.copy()
-
 
     # atoms_copy = FandeAtomsWrapper(atoms_copy)
     # atoms_copy.request_variance = True
@@ -361,47 +399,48 @@ def make_client(i, gpu_id_list):
     # calc = fande_calc
    
     # https://dftb.org/parameters/download/3ob/3ob-3-1-cc
-    atoms_copy = FandeAtomsWrapper(atoms_copy)
-    atoms_copy.request_variance = False
+    # atoms_copy = FandeAtomsWrapper(atoms_copy)
+    # atoms_copy.request_variance = False
     atoms_copy = RotationAtomsWrapper(atoms_copy)
 
     # atoms_copy.set_pbc(False)
     # calc_xtb = XTB(method='GFN-FF')
     # atoms_copy.set_calculator(calc_xtb)
 
-    atoms_copy.set_pbc(False)
-    calc_gulp = GULP(keywords='gfnff gwolf conv gradient', options=[''], library=False)
-    atoms_copy.set_calculator(calc_gulp)
+    # atoms_copy.set_pbc(False)
+    # calc_gulp = GULP(keywords='gfnff gwolf conv gradient', options=[''], library=False)
+    # atoms_copy.set_calculator(calc_gulp)
 
-    # calc = Dftb(atoms=atoms_copy,
-    #         label='crystal',
-    #         # Hamiltonian_ = "xTB",
-    #         # # Hamiltonian_Method = "GFN1-xTB",
-    #         Hamiltonian_MaxAngularMomentum_='',
-    #         Hamiltonian_MaxAngularMomentum_H='s',
-    #         Hamiltonian_MaxAngularMomentum_O='p',
-    #         Hamiltonian_MaxAngularMomentum_N='p',
-    #         Hamiltonian_MaxAngularMomentum_C='p',
-    #         Hamiltonian_MaxAngularMomentum_Si='d',
-    #         kpts=(1,1,1),
-    #         Hamiltonian_SCC='Yes',
-    #         # Verbosity=0,
-    #         # Hamiltonian_OrbitalResolvedSCC = 'Yes',
-    #         # Hamiltonian_SCCTolerance=1e-15,
-    #         # kpts=None,
-    #         # Driver_='ConjugateGradient',
-    #         # Driver_MaxForceComponent=1e-3,
-    #         # Driver_MaxSteps=200,
-    #         # Driver_LatticeOpt = 'Yes',
-    #         #     Driver_AppendGeometries = 'Yes',
-    #         #     Driver_='',
-    #         #     Driver_Socket_='',
-    #         #     Driver_Socket_File='Hello'
-    #         )
+    atoms_copy.set_pbc(True)
+    calc = Dftb(atoms=atoms_copy,
+            label='crystal',
+            # Hamiltonian_ = "xTB",
+            # # Hamiltonian_Method = "GFN1-xTB",
+            Hamiltonian_MaxAngularMomentum_='',
+            Hamiltonian_MaxAngularMomentum_H='s',
+            Hamiltonian_MaxAngularMomentum_O='p',
+            Hamiltonian_MaxAngularMomentum_N='p',
+            Hamiltonian_MaxAngularMomentum_C='p',
+            Hamiltonian_MaxAngularMomentum_Si='d',
+            kpts=(1,1,1),
+            Hamiltonian_SCC='No',
+            # Verbosity=0,
+            # Hamiltonian_OrbitalResolvedSCC = 'Yes',
+            # Hamiltonian_SCCTolerance=1e-15,
+            # kpts=None,
+            # Driver_='ConjugateGradient',
+            # Driver_MaxForceComponent=1e-3,
+            # Driver_MaxSteps=200,
+            # Driver_LatticeOpt = 'Yes',
+            #     Driver_AppendGeometries = 'Yes',
+            #     Driver_='',
+            #     Driver_Socket_='',
+            #     Driver_Socket_File='Hello'
+            )
 
-    # atoms_copy.set_calculator(calc)
+    atoms_copy.set_calculator(calc)
 
-    # print( atoms_copy.get_potential_energy() )
+    print( atoms_copy.get_potential_energy() )
 
     print("Calculator is set up!")
     # print( atoms_copy.get_forces() )
@@ -419,11 +458,12 @@ def make_client(i, gpu_id_list):
 
 from joblib import Parallel, delayed
 
-K = 2 #len(pimd_port_list)
+K = PIMD_NUM_CALCS #len(pimd_port_list)
 gpu_id_list = []
 # gpu_id_list = [0, 1, 2, 3, 4, 5, 6, 7] * 2
 # K=41
 
+print("Starting clients with joblib...")
 status = Parallel(n_jobs=K, prefer="processes")(delayed(make_client)(i, gpu_id_list) for i in range(0, K)) 
 
 
