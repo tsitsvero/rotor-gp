@@ -249,7 +249,7 @@ class RotationAtomsWrapper(Atoms):
     def __init__(self, *args, **kwargs):
         super(RotationAtomsWrapper, self).__init__(*args, **kwargs)      
         self.calc_history_counter = 0
-        self.forces_alpha = [0.0, -0.0, -0.0, 0.0, -0.0, -0.0,   -0.0, 0.0, 0.0,  -0.0, 0.0, 0.0] #[0.05] * 12
+        self.forces_alpha = [0.06, -0.0, -0.0, 0.0, -0.0, -0.0,   -0.0, 0.0, 0.0,  -0.0, 0.0, 0.0] #[0.05] * 12
 
     def get_forces(self, md=True):       
         forces = super(RotationAtomsWrapper, self).get_forces(md=md)
@@ -423,7 +423,7 @@ def make_client(i, gpu_id_list):
             Hamiltonian_MaxAngularMomentum_C='p',
             Hamiltonian_MaxAngularMomentum_Si='d',
             kpts=(1,1,1),
-            Hamiltonian_SCC='No',
+            Hamiltonian_SCC='Yes',
             # Verbosity=0,
             # Hamiltonian_OrbitalResolvedSCC = 'Yes',
             # Hamiltonian_SCCTolerance=1e-15,
