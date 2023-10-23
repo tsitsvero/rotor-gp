@@ -140,7 +140,7 @@ soap_params = {
 #### for rotors
 from ase import io
 
-STRUCTURE="295K"
+STRUCTURE="355K"
 
 if STRUCTURE == "295K":
     # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/295optdftb.cif"), format="cif" )
@@ -192,7 +192,8 @@ if STRUCTURE == "295K":
     ring_F_full = ring_F + axis_ring_F + [115, 117, 119, 121] # not rotating
 
 elif STRUCTURE == "355K":
-    crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/2.cif"), format="cif" )
+    # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/2.cif"), format="cif" )
+    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/355Ksupercell.cif"), format="cif" ) 
     # 355 K structure:
     triazine_1 = [6, 8, 10, 102, 104, 106]
     triazine_2 = [9, 7, 11, 103, 105, 107]
@@ -249,7 +250,7 @@ class RotationAtomsWrapper(Atoms):
     def __init__(self, *args, **kwargs):
         super(RotationAtomsWrapper, self).__init__(*args, **kwargs)      
         self.calc_history_counter = 0
-        self.forces_alpha = [0.06, -0.0, -0.0, 0.0, -0.0, -0.0,   -0.0, 0.0, 0.0,  -0.0, 0.0, 0.0] #[0.05] * 12
+        self.forces_alpha = [0.0, -0.0, -0.0, 0.0, -0.0, -0.0,   -0.0, 0.0, 0.0,  -0.0, 0.0, 0.06] #[0.05] * 12
 
     def get_forces(self, md=True):       
         forces = super(RotationAtomsWrapper, self).get_forces(md=md)
