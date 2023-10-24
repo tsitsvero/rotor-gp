@@ -142,57 +142,57 @@ from ase import io
 
 STRUCTURE="355K"
 
-# if STRUCTURE == "295K":
-#     # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/295optdftb.cif"), format="cif" )
-#     crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/295Ksupercell.cif"), format="cif" ) 
-#     # 295 K structure:
-#     triazine_1 = [6, 8, 10, 102, 104, 106]
-#     triazine_2 = [9, 7, 11, 103, 105, 107]
-#     triazine_3 = [270, 272, 274, 366, 368, 370]
-#     triazine_4 = [271, 273, 275, 367, 369, 371]
-#     axis_ring_1 = [27, 33]
-#     ring_1 = [25, 29, 31, 35]
-#     ring_1_full = ring_1 + axis_ring_1 + [123, 125, 127, 129]
-#     axis_ring_2 = [308, 302]
-#     ring_2 = [304, 306, 310, 312]
-#     ring_2_full = ring_2 + axis_ring_2 + [396, 398, 400, 402]
-#     axis_ring_3 = [282, 276]
-#     ring_3 = [278, 280, 284, 286]
-#     ring_3_full = ring_3 + axis_ring_3 + [378, 380, 382, 384]
-#     axis_ring_4 = [291, 297]
-#     ring_4 = [289, 293, 295, 299]
-#     ring_4_full = ring_4 + axis_ring_4 + [387, 389, 391, 393]
-#     axis_ring_5 = [18, 12]
-#     ring_5 = [14, 16, 20, 22]
-#     ring_5_full = ring_5 + axis_ring_5 + [114, 116, 118, 120]
-#     axis_ring_6 = [44, 38]
-#     ring_6 = [40, 42, 46, 48]
-#     ring_6_full = ring_6 + axis_ring_6 + [132, 134, 136, 138]
+if STRUCTURE == "295K":
+    # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/295optdftb.cif"), format="cif" )
+    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/295Ksupercell.cif"), format="cif" ) 
+    # 295 K structure:
+    triazine_1 = [6, 8, 10, 102, 104, 106]
+    triazine_2 = [9, 7, 11, 103, 105, 107]
+    triazine_3 = [270, 272, 274, 366, 368, 370]
+    triazine_4 = [271, 273, 275, 367, 369, 371]
+    axis_ring_1 = [27, 33]
+    ring_1 = [25, 29, 31, 35]
+    ring_1_full = ring_1 + axis_ring_1 + [123, 125, 127, 129]
+    axis_ring_2 = [308, 302]
+    ring_2 = [304, 306, 310, 312]
+    ring_2_full = ring_2 + axis_ring_2 + [396, 398, 400, 402]
+    axis_ring_3 = [282, 276]
+    ring_3 = [278, 280, 284, 286]
+    ring_3_full = ring_3 + axis_ring_3 + [378, 380, 382, 384]
+    axis_ring_4 = [291, 297]
+    ring_4 = [289, 293, 295, 299]
+    ring_4_full = ring_4 + axis_ring_4 + [387, 389, 391, 393]
+    axis_ring_5 = [18, 12]
+    ring_5 = [14, 16, 20, 22]
+    ring_5_full = ring_5 + axis_ring_5 + [114, 116, 118, 120]
+    axis_ring_6 = [44, 38]
+    ring_6 = [40, 42, 46, 48]
+    ring_6_full = ring_6 + axis_ring_6 + [132, 134, 136, 138]
 
-#     axis_ring_A = [290, 296]
-#     ring_A = [292, 294, 288, 298]
-#     ring_A_full = ring_A + axis_ring_A + [386, 388, 390, 392]
-#     axis_ring_B = [309, 303]
-#     ring_B = [305, 307, 311, 313]
-#     ring_B_full = ring_B + axis_ring_B + [397, 399, 401, 403]
-#     axis_ring_C = [283, 277]
-#     ring_C = [279, 281, 285, 287]
-#     ring_C_full = ring_C + axis_ring_C + [379, 381, 383, 385]
+    axis_ring_A = [290, 296]
+    ring_A = [292, 294, 288, 298]
+    ring_A_full = ring_A + axis_ring_A + [386, 388, 390, 392]
+    axis_ring_B = [309, 303]
+    ring_B = [305, 307, 311, 313]
+    ring_B_full = ring_B + axis_ring_B + [397, 399, 401, 403]
+    axis_ring_C = [283, 277]
+    ring_C = [279, 281, 285, 287]
+    ring_C_full = ring_C + axis_ring_C + [379, 381, 383, 385]
 
-#     axis_ring_D = [26, 32]
-#     ring_D = [24, 28, 30, 34]
-#     ring_D_full = ring_D + axis_ring_D + [122, 124, 126, 128]
+    axis_ring_D = [26, 32]
+    ring_D = [24, 28, 30, 34]
+    ring_D_full = ring_D + axis_ring_D + [122, 124, 126, 128]
 
-#     axis_ring_E = [45, 39]
-#     ring_E = [41, 43, 47, 49]
-#     ring_E_full = ring_E + axis_ring_E + [133, 135, 137, 139] # not rotating
+    axis_ring_E = [45, 39]
+    ring_E = [41, 43, 47, 49]
+    ring_E_full = ring_E + axis_ring_E + [133, 135, 137, 139] # not rotating
 
-#     axis_ring_F = [19, 13]
-#     ring_F = [15, 17, 21, 23]
-#     ring_F_full = ring_F + axis_ring_F + [115, 117, 119, 121] # not rotating
-#     RuntimeError("you was running with STRUCTURE 355K!")
+    axis_ring_F = [19, 13]
+    ring_F = [15, 17, 21, 23]
+    ring_F_full = ring_F + axis_ring_F + [115, 117, 119, 121] # not rotating
+    RuntimeError("you was running with STRUCTURE 355K!")
 
-if STRUCTURE == "355K":
+elif STRUCTURE == "355K":
     # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/2.cif"), format="cif" )
     crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/355Ksupercell.cif"), format="cif" ) 
     # 355 K structure:
@@ -261,7 +261,10 @@ class RotationAtomsWrapper(Atoms):
         # os.makedirs("ase_calc_history" , exist_ok=True)
         # write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
         # self.calc_history.append(self.copy())       
-        # self.calc_history_counter += 1
+        
+        if self.calc_history_counter != 0:
+            # self.positions = self.positions + self.get_cell()[0] / 2.0 + self.get_cell()[1] / 2.0 + self.get_cell()[2] / 2.0
+            self.wrap()
 
         axis_1_vector = self.positions[axis_ring_1[1]] - self.positions[axis_ring_1[0]]
         axis_1_center = (self.positions[axis_ring_1[1]] + self.positions[axis_ring_1[0]]) / 2.0
@@ -380,19 +383,26 @@ class RotationAtomsWrapper(Atoms):
         # ic(self.positions[ring_E])
         # ic(self.positions[ring_F])
 
-        from ase.visualize import view
+        # from ase.visualize import view
+        # view(self[ring_1_full])
+        # view(self[ring_2_full])
         # view(self[ring_3_full])
+        # view(self[ring_4_full])
+        # view(self[ring_5_full])
+        # view(self[ring_6_full])
         # input("Press Enter to continue...")
         # ic(self.get_chemical_symbols())
 
         # ic(self.get_cell())
 
-        from ase import io
-        io.write("/home/dlbox2/repos/rotor-gp/code/pimd/355K_dftb_1/sample_crystal.xyz", self, format="extxyz")
-        input("Press Enter to continue...")
-        crys = io.read("/home/dlbox2/repos/rotor-gp/code/pimd/355K_dftb_1/sample_crystal.xyz", format="extxyz")
-        view(crys)
+        # self.wrap()
+        # from ase import io
+        # io.write("/home/dlbox2/repos/rotor-gp/code/pimd/355K_dftb_1/sample_crystal.xyz", self, format="extxyz")
+        # input("Press Enter to continue...")
+        # crys = io.read("/home/dlbox2/repos/rotor-gp/code/pimd/355K_dftb_1/sample_crystal.xyz", format="extxyz")
+        # view(crys)
 
+        self.calc_history_counter += 1
         return forces
 
 ####
