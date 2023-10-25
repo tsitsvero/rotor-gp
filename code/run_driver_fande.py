@@ -194,7 +194,7 @@ if STRUCTURE == "295K":
 
 elif STRUCTURE == "355K":
     # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/2.cif"), format="cif" )
-    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/355Ksupercell.cif"), format="cif" ) 
+    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/355Ksupercell-shifted.cif"), format="cif" ) 
     # 355 K structure:
     triazine_1 = [6, 8, 10, 102, 104, 106]
     triazine_2 = [9, 7, 11, 103, 105, 107]
@@ -249,11 +249,21 @@ from icecream import ic
 
 from ase import Atoms
 import os
-class RotationAtomsWrapper(Atoms):   
+class RotationAtomsWrapper(Atoms):
+    """
+    NOTE: to use with i-PI you need to prepare the cell by shifting it to the center of the structure:
+    ``` python
+    crystal.set_cell( crystal.get_cell() - crystal.get_cell()[0] / 2.0 - crystal.get_cell()[1] / 2.0 - crystal.get_cell()[2] / 2.0 ) 
+    ```
+    and then io.write("...", crystal, format="cif")
+    """
+
     def __init__(self, *args, **kwargs):
         super(RotationAtomsWrapper, self).__init__(*args, **kwargs)      
         self.calc_history_counter = 0
         self.forces_alpha = [0.5, -0.5, -0.5, 0.5, -0.5, -0.5,   -0.5, 0.5, 0.5,  -0.5, 0.5, 0.5]    #[0.05] * 12
+
+        self.traj = []
 
     def get_forces(self, md=False):       
         forces = super(RotationAtomsWrapper, self).get_forces(md=md)
@@ -262,14 +272,16 @@ class RotationAtomsWrapper(Atoms):
         # write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
         # self.calc_history.append(self.copy())       
         
-        if self.calc_history_counter != 0:
-        #     # self.positions = self.positions + self.get_cell()[0] / 4.0 + self.get_cell()[1] / 4.0 + self.get_cell()[2] / 4.0
-        #     self.wrap(eps=0.0)
-            negative_positions = self.positions < 0.0
-            # ic(negative_positions)
-            # self.positions[negative_positions[:,0], 0] += self.get_cell()[:,0].sum()
-            self.positions[negative_positions[:,1], 1] += self.get_cell()[:,1].sum()
-            # self.positions[negative_positions[:,2], 2] += self.get_cell()[:,2].sum()
+        # if self.calc_history_counter != 0:
+        # #     # self.positions = self.positions + self.get_cell()[0] / 4.0 + self.get_cell()[1] / 4.0 + self.get_cell()[2] / 4.0
+        # #     self.wrap(eps=0.0)
+        #     negative_positions = self.positions < 0.0
+        #     # ic(negative_positions)
+        #     # self.positions[negative_positions[:,0], 0] += self.get_cell()[:,0].sum()
+        #     self.positions[negative_positions[:,1], 1] += self.get_cell()[:,1].sum()
+        #     # self.positions[negative_positions[:,2], 2] += self.get_cell()[:,2].sum()
+
+        # crystal.set_cell( crystal.get_cell() - crystal.get_cell()[0] / 2.0 - crystal.get_cell()[1] / 2.0 - crystal.get_cell()[2] / 2.0 )
 
         axis_1_vector = self.positions[axis_ring_1[1]] - self.positions[axis_ring_1[0]]
         axis_1_center = (self.positions[axis_ring_1[1]] + self.positions[axis_ring_1[0]]) / 2.0
@@ -388,8 +400,14 @@ class RotationAtomsWrapper(Atoms):
         # ic(self.positions[ring_E])
         # ic(self.positions[ring_F])
 
-        from ase.visualize import view
-        view(self)
+        forces[198] = 100.0 * forces[198]
+                  
+
+        self.traj.append(self.copy())
+
+        if self.calc_history_counter % 10 == 0:
+            from ase.visualize import view
+            view(self.traj)
         
         # view(self[ring_1_full])
         # view(self[ring_2_full])
@@ -397,7 +415,7 @@ class RotationAtomsWrapper(Atoms):
         # view(self[ring_4_full])
         # view(self[ring_5_full])
         # view(self[ring_6_full])
-        input("Press Enter to continue...")
+            input("Press Enter to continue...")
         # ic(self.get_chemical_symbols())
 
         # ic(self.get_cell())
