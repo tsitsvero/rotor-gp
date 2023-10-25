@@ -263,8 +263,13 @@ class RotationAtomsWrapper(Atoms):
         # self.calc_history.append(self.copy())       
         
         if self.calc_history_counter != 0:
-            # self.positions = self.positions + self.get_cell()[0] / 2.0 + self.get_cell()[1] / 2.0 + self.get_cell()[2] / 2.0
-            self.wrap()
+        #     # self.positions = self.positions + self.get_cell()[0] / 4.0 + self.get_cell()[1] / 4.0 + self.get_cell()[2] / 4.0
+        #     self.wrap(eps=0.0)
+            negative_positions = self.positions < 0.0
+            # ic(negative_positions)
+            # self.positions[negative_positions[:,0], 0] += self.get_cell()[:,0].sum()
+            self.positions[negative_positions[:,1], 1] += self.get_cell()[:,1].sum()
+            # self.positions[negative_positions[:,2], 2] += self.get_cell()[:,2].sum()
 
         axis_1_vector = self.positions[axis_ring_1[1]] - self.positions[axis_ring_1[0]]
         axis_1_center = (self.positions[axis_ring_1[1]] + self.positions[axis_ring_1[0]]) / 2.0
@@ -383,14 +388,16 @@ class RotationAtomsWrapper(Atoms):
         # ic(self.positions[ring_E])
         # ic(self.positions[ring_F])
 
-        # from ase.visualize import view
+        from ase.visualize import view
+        view(self)
+        
         # view(self[ring_1_full])
         # view(self[ring_2_full])
         # view(self[ring_3_full])
         # view(self[ring_4_full])
         # view(self[ring_5_full])
         # view(self[ring_6_full])
-        # input("Press Enter to continue...")
+        input("Press Enter to continue...")
         # ic(self.get_chemical_symbols())
 
         # ic(self.get_cell())
