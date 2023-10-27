@@ -194,7 +194,7 @@ if STRUCTURE == "295K":
 
 elif STRUCTURE == "355K":
     # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/2.cif"), format="cif" )
-    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/355Ksupercell-shifted.cif"), format="cif" ) 
+    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/355Ksupercell.cif"), format="cif" ) 
     # 355 K structure:
     triazine_1 = [6, 8, 10, 102, 104, 106]
     triazine_2 = [9, 7, 11, 103, 105, 107]
@@ -247,15 +247,13 @@ atoms = crystal.copy()
 import numpy as np
 from icecream import ic
 
+from ase import geometry
+
 from ase import Atoms
 import os
 class RotationAtomsWrapper(Atoms):
     """
-    NOTE: to use with i-PI you need to prepare the cell by shifting it to the center of the structure:
-    ``` python
-    crystal.set_cell( crystal.get_cell() - crystal.get_cell()[0] / 2.0 - crystal.get_cell()[1] / 2.0 - crystal.get_cell()[2] / 2.0 ) 
-    ```
-    and then io.write("...", crystal, format="cif")
+    NOTE: to use with i-PI make sure to use geometry.find_mic() to correct for periodic boundary conditions!
     """
 
     def __init__(self, *args, **kwargs):
@@ -264,6 +262,8 @@ class RotationAtomsWrapper(Atoms):
         self.forces_alpha = [0.5, -0.5, -0.5, 0.5, -0.5, -0.5,   -0.5, 0.5, 0.5,  -0.5, 0.5, 0.5]    #[0.05] * 12
 
         self.traj = []
+
+        self.previous_atoms = None
 
     def get_forces(self, md=False):       
         forces = super(RotationAtomsWrapper, self).get_forces(md=md)
@@ -280,6 +280,12 @@ class RotationAtomsWrapper(Atoms):
         #     # self.positions[negative_positions[:,0], 0] += self.get_cell()[:,0].sum()
         #     self.positions[negative_positions[:,1], 1] += self.get_cell()[:,1].sum()
         #     # self.positions[negative_positions[:,2], 2] += self.get_cell()[:,2].sum()
+
+        # if self.previous_atoms is not None:
+        #     diff_positions = self.positions - self.previous_atoms.positions
+        #     La, Lb, Lc = self.get_cell_lengths_and_angles()[0:3]
+
+
 
         # crystal.set_cell( crystal.get_cell() - crystal.get_cell()[0] / 2.0 - crystal.get_cell()[1] / 2.0 - crystal.get_cell()[2] / 2.0 )
 
@@ -343,6 +349,69 @@ class RotationAtomsWrapper(Atoms):
         rotor_F_relative_positions = self.positions[ring_F] - axis_F_center
         rotor_F_cross_product = np.cross(rotor_F_relative_positions, axis_F_vector)
 
+
+        #correct for periodic boundary conditions:
+        axis_1_vector = geometry.find_mic(axis_1_vector, self.get_cell()) [0]
+        axis_1_center = geometry.find_mic(axis_1_center, self.get_cell()) [0]
+        rotor_1_relative_positions = geometry.find_mic(rotor_1_relative_positions, self.get_cell()) [0]
+        rotor_1_cross_product = geometry.find_mic(rotor_1_cross_product, self.get_cell()) [0]
+
+        axis_2_vector = geometry.find_mic(axis_2_vector, self.get_cell()) [0]
+        axis_2_center = geometry.find_mic(axis_2_center, self.get_cell()) [0]
+        rotor_2_relative_positions = geometry.find_mic(rotor_2_relative_positions, self.get_cell()) [0]
+        rotor_2_cross_product = geometry.find_mic(rotor_2_cross_product, self.get_cell()) [0]
+
+        axis_3_vector = geometry.find_mic(axis_3_vector, self.get_cell()) [0]
+        axis_3_center = geometry.find_mic(axis_3_center, self.get_cell()) [0]
+        rotor_3_relative_positions = geometry.find_mic(rotor_3_relative_positions, self.get_cell()) [0]
+        rotor_3_cross_product = geometry.find_mic(rotor_3_cross_product, self.get_cell()) [0]
+
+        axis_4_vector = geometry.find_mic(axis_4_vector, self.get_cell()) [0]
+        axis_4_center = geometry.find_mic(axis_4_center, self.get_cell()) [0]
+        rotor_4_relative_positions = geometry.find_mic(rotor_4_relative_positions, self.get_cell()) [0]
+        rotor_4_cross_product = geometry.find_mic(rotor_4_cross_product, self.get_cell()) [0]
+
+        axis_5_vector = geometry.find_mic(axis_5_vector, self.get_cell()) [0]
+        axis_5_center = geometry.find_mic(axis_5_center, self.get_cell()) [0]
+        rotor_5_relative_positions = geometry.find_mic(rotor_5_relative_positions, self.get_cell()) [0]
+        rotor_5_cross_product = geometry.find_mic(rotor_5_cross_product, self.get_cell()) [0]
+
+        axis_6_vector = geometry.find_mic(axis_6_vector, self.get_cell()) [0]
+        axis_6_center = geometry.find_mic(axis_6_center, self.get_cell()) [0]
+        rotor_6_relative_positions = geometry.find_mic(rotor_6_relative_positions, self.get_cell()) [0]
+        rotor_6_cross_product = geometry.find_mic(rotor_6_cross_product, self.get_cell()) [0]
+
+        axis_A_vector = geometry.find_mic(axis_A_vector, self.get_cell()) [0]
+        axis_A_center = geometry.find_mic(axis_A_center, self.get_cell()) [0]
+        rotor_A_relative_positions = geometry.find_mic(rotor_A_relative_positions, self.get_cell()) [0]
+        rotor_A_cross_product = geometry.find_mic(rotor_A_cross_product, self.get_cell()) [0]
+
+        axis_B_vector = geometry.find_mic(axis_B_vector, self.get_cell()) [0]
+        axis_B_center = geometry.find_mic(axis_B_center, self.get_cell()) [0]
+        rotor_B_relative_positions = geometry.find_mic(rotor_B_relative_positions, self.get_cell()) [0]
+        rotor_B_cross_product = geometry.find_mic(rotor_B_cross_product, self.get_cell()) [0]
+
+        axis_C_vector = geometry.find_mic(axis_C_vector, self.get_cell()) [0]
+        axis_C_center = geometry.find_mic(axis_C_center, self.get_cell()) [0]
+        rotor_C_relative_positions = geometry.find_mic(rotor_C_relative_positions, self.get_cell()) [0]
+        rotor_C_cross_product = geometry.find_mic(rotor_C_cross_product, self.get_cell()) [0]
+
+        axis_D_vector = geometry.find_mic(axis_D_vector, self.get_cell()) [0]
+        axis_D_center = geometry.find_mic(axis_D_center, self.get_cell()) [0]
+        rotor_D_relative_positions = geometry.find_mic(rotor_D_relative_positions, self.get_cell()) [0]
+        rotor_D_cross_product = geometry.find_mic(rotor_D_cross_product, self.get_cell()) [0]
+
+        axis_E_vector = geometry.find_mic(axis_E_vector, self.get_cell()) [0]
+        axis_E_center = geometry.find_mic(axis_E_center, self.get_cell()) [0]
+        rotor_E_relative_positions = geometry.find_mic(rotor_E_relative_positions, self.get_cell()) [0]
+        rotor_E_cross_product = geometry.find_mic(rotor_E_cross_product, self.get_cell()) [0]
+
+        axis_F_vector = geometry.find_mic(axis_F_vector, self.get_cell()) [0]
+        axis_F_center = geometry.find_mic(axis_F_center, self.get_cell()) [0]
+        rotor_F_relative_positions = geometry.find_mic(rotor_F_relative_positions, self.get_cell()) [0]
+        rotor_F_cross_product = geometry.find_mic(rotor_F_cross_product, self.get_cell()) [0]
+
+
         
         forces_torque_1 = rotor_1_cross_product * self.forces_alpha[0]
         forces_torque_2 = rotor_2_cross_product * self.forces_alpha[1]
@@ -400,14 +469,14 @@ class RotationAtomsWrapper(Atoms):
         # ic(self.positions[ring_E])
         # ic(self.positions[ring_F])
 
-        forces[198] = 100.0 * forces[198]
+        # forces[198] = 100.0 * forces[198]
                   
 
-        self.traj.append(self.copy())
+        # self.traj.append(self.copy())
 
-        if self.calc_history_counter % 10 == 0:
-            from ase.visualize import view
-            view(self.traj)
+        # if self.calc_history_counter % 5 == 0:
+        #     from ase.visualize import view
+        #     view(self.traj)
         
         # view(self[ring_1_full])
         # view(self[ring_2_full])
@@ -415,7 +484,7 @@ class RotationAtomsWrapper(Atoms):
         # view(self[ring_4_full])
         # view(self[ring_5_full])
         # view(self[ring_6_full])
-            input("Press Enter to continue...")
+            # input("Press Enter to continue...")
         # ic(self.get_chemical_symbols())
 
         # ic(self.get_cell())
