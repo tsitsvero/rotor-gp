@@ -259,7 +259,7 @@ class RotationAtomsWrapper(Atoms):
     def __init__(self, *args, **kwargs):
         super(RotationAtomsWrapper, self).__init__(*args, **kwargs)      
         self.calc_history_counter = 0
-        self.forces_alpha = [0.5, -0.5, -0.5, 0.5, -0.5, -0.5,   -0.5, 0.5, 0.5,  -0.5, 0.5, 0.5]    #[0.05] * 12
+        self.forces_alpha = [0.05, -0.05, -0.05, 0.05, -0.05, -0.05,   -0.05, 0.05, 0.05,  -0.05, 0.05, 0.05]    #[0.05] * 12
 
         self.traj = []
 
