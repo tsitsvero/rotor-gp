@@ -194,7 +194,8 @@ if STRUCTURE == "295K":
 
 elif STRUCTURE == "355K":
     # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/2.cif"), format="cif" )
-    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/355Ksupercell.cif"), format="cif" ) 
+    # crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/355Ksupercell.cif"), format="cif" ) 
+    crystal = io.read( os.path.expanduser("/home/dlbox2/ダウンロード/artificial-rotor/structures/triazine/ipi/C5H5N-test.cif"), format="cif" ) 
     # 355 K structure:
     triazine_1 = [6, 8, 10, 102, 104, 106]
     triazine_2 = [9, 7, 11, 103, 105, 107]
@@ -244,6 +245,12 @@ else:
 atoms = crystal.copy()
 
 
+### for testing with c5h5n:
+axis_test = [0,1]
+ring_test = [2,3,4,5]
+###
+
+
 import numpy as np
 from icecream import ic
 
@@ -272,229 +279,176 @@ class RotationAtomsWrapper(Atoms):
         # write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
         # self.calc_history.append(self.copy())       
         
-        # if self.calc_history_counter != 0:
-        # #     # self.positions = self.positions + self.get_cell()[0] / 4.0 + self.get_cell()[1] / 4.0 + self.get_cell()[2] / 4.0
-        # #     self.wrap(eps=0.0)
-        #     negative_positions = self.positions < 0.0
-        #     # ic(negative_positions)
-        #     # self.positions[negative_positions[:,0], 0] += self.get_cell()[:,0].sum()
-        #     self.positions[negative_positions[:,1], 1] += self.get_cell()[:,1].sum()
-        #     # self.positions[negative_positions[:,2], 2] += self.get_cell()[:,2].sum()
 
-        # if self.previous_atoms is not None:
-        #     diff_positions = self.positions - self.previous_atoms.positions
-        #     La, Lb, Lc = self.get_cell_lengths_and_angles()[0:3]
+        # axis_1_vector = self.positions[axis_ring_1[1]] - self.positions[axis_ring_1[0]]
+        # axis_1_center = (self.positions[axis_ring_1[1]] + self.positions[axis_ring_1[0]]) / 2.0
+        # rotor_1_relative_positions = self.positions[ring_1] - axis_1_center
+        # rotor_1_cross_product = np.cross(rotor_1_relative_positions, axis_1_vector)
+
+        # axis_2_vector = self.positions[axis_ring_2[1]] - self.positions[axis_ring_2[0]]
+        # axis_2_center = (self.positions[axis_ring_2[1]] + self.positions[axis_ring_2[0]]) / 2.0
+        # rotor_2_relative_positions = self.positions[ring_2] - axis_2_center
+        # rotor_2_cross_product = np.cross(rotor_2_relative_positions, axis_2_vector)
+
+        # axis_3_vector = self.positions[axis_ring_3[1]] - self.positions[axis_ring_3[0]]
+        # axis_3_center = (self.positions[axis_ring_3[1]] + self.positions[axis_ring_3[0]]) / 2.0
+        # rotor_3_relative_positions = self.positions[ring_3] - axis_3_center
+        # rotor_3_cross_product = np.cross(rotor_3_relative_positions, axis_3_vector)
+
+        # axis_4_vector = self.positions[axis_ring_4[1]] - self.positions[axis_ring_4[0]]
+        # axis_4_center = (self.positions[axis_ring_4[1]] + self.positions[axis_ring_4[0]]) / 2.0
+        # rotor_4_relative_positions = self.positions[ring_4] - axis_4_center
+        # rotor_4_cross_product = np.cross(rotor_4_relative_positions, axis_4_vector)
+
+        # axis_5_vector = self.positions[axis_ring_5[1]] - self.positions[axis_ring_5[0]]
+        # axis_5_center = (self.positions[axis_ring_5[1]] + self.positions[axis_ring_5[0]]) / 2.0
+        # rotor_5_relative_positions = self.positions[ring_5] - axis_5_center
+        # rotor_5_cross_product = np.cross(rotor_5_relative_positions, axis_5_vector)
+
+        # axis_6_vector = self.positions[axis_ring_6[1]] - self.positions[axis_ring_6[0]]
+        # axis_6_center = (self.positions[axis_ring_6[1]] + self.positions[axis_ring_6[0]]) / 2.0
+        # rotor_6_relative_positions = self.positions[ring_6] - axis_6_center
+        # rotor_6_cross_product = np.cross(rotor_6_relative_positions, axis_6_vector)
+
+        # axis_A_vector = self.positions[axis_ring_A[1]] - self.positions[axis_ring_A[0]]
+        # axis_A_center = (self.positions[axis_ring_A[1]] + self.positions[axis_ring_A[0]]) / 2.0
+        # rotor_A_relative_positions = self.positions[ring_A] - axis_A_center
+        # rotor_A_cross_product = np.cross(rotor_A_relative_positions, axis_A_vector)
+
+        # axis_B_vector = self.positions[axis_ring_B[1]] - self.positions[axis_ring_B[0]]
+        # axis_B_center = (self.positions[axis_ring_B[1]] + self.positions[axis_ring_B[0]]) / 2.0
+        # rotor_B_relative_positions = self.positions[ring_B] - axis_B_center
+        # rotor_B_cross_product = np.cross(rotor_B_relative_positions, axis_B_vector)
+
+        # axis_C_vector = self.positions[axis_ring_C[1]] - self.positions[axis_ring_C[0]]
+        # axis_C_center = (self.positions[axis_ring_C[1]] + self.positions[axis_ring_C[0]]) / 2.0
+        # rotor_C_relative_positions = self.positions[ring_C] - axis_C_center
+        # rotor_C_cross_product = np.cross(rotor_C_relative_positions, axis_C_vector)
+
+        # axis_D_vector = self.positions[axis_ring_D[1]] - self.positions[axis_ring_D[0]]
+        # axis_D_center = (self.positions[axis_ring_D[1]] + self.positions[axis_ring_D[0]]) / 2.0
+        # rotor_D_relative_positions = self.positions[ring_D] - axis_D_center
+        # rotor_D_cross_product = np.cross(rotor_D_relative_positions, axis_D_vector)
+
+        # axis_E_vector = self.positions[axis_ring_E[1]] - self.positions[axis_ring_E[0]]
+        # axis_E_center = (self.positions[axis_ring_E[1]] + self.positions[axis_ring_E[0]]) / 2.0
+        # rotor_E_relative_positions = self.positions[ring_E] - axis_E_center
+        # rotor_E_cross_product = np.cross(rotor_E_relative_positions, axis_E_vector)
+
+        # axis_F_vector = self.positions[axis_ring_F[1]] - self.positions[axis_ring_F[0]]
+        # axis_F_center = (self.positions[axis_ring_F[1]] + self.positions[axis_ring_F[0]]) / 2.0
+        # rotor_F_relative_positions = self.positions[ring_F] - axis_F_center
+        # rotor_F_cross_product = np.cross(rotor_F_relative_positions, axis_F_vector)
 
 
+        # #correct for periodic boundary conditions:
+        # axis_1_vector = geometry.find_mic(axis_1_vector, self.get_cell()) [0]
+        # axis_1_center = geometry.find_mic(axis_1_center, self.get_cell()) [0]
+        # rotor_1_relative_positions = geometry.find_mic(rotor_1_relative_positions, self.get_cell()) [0]
+        # rotor_1_cross_product = geometry.find_mic(rotor_1_cross_product, self.get_cell()) [0]
 
-        # crystal.set_cell( crystal.get_cell() - crystal.get_cell()[0] / 2.0 - crystal.get_cell()[1] / 2.0 - crystal.get_cell()[2] / 2.0 )
+        # axis_2_vector = geometry.find_mic(axis_2_vector, self.get_cell()) [0]
+        # axis_2_center = geometry.find_mic(axis_2_center, self.get_cell()) [0]
+        # rotor_2_relative_positions = geometry.find_mic(rotor_2_relative_positions, self.get_cell()) [0]
+        # rotor_2_cross_product = geometry.find_mic(rotor_2_cross_product, self.get_cell()) [0]
 
-        axis_1_vector = self.positions[axis_ring_1[1]] - self.positions[axis_ring_1[0]]
-        axis_1_center = (self.positions[axis_ring_1[1]] + self.positions[axis_ring_1[0]]) / 2.0
-        rotor_1_relative_positions = self.positions[ring_1] - axis_1_center
-        rotor_1_cross_product = np.cross(rotor_1_relative_positions, axis_1_vector)
+        # axis_3_vector = geometry.find_mic(axis_3_vector, self.get_cell()) [0]
+        # axis_3_center = geometry.find_mic(axis_3_center, self.get_cell()) [0]
+        # rotor_3_relative_positions = geometry.find_mic(rotor_3_relative_positions, self.get_cell()) [0]
+        # rotor_3_cross_product = geometry.find_mic(rotor_3_cross_product, self.get_cell()) [0]
 
-        axis_2_vector = self.positions[axis_ring_2[1]] - self.positions[axis_ring_2[0]]
-        axis_2_center = (self.positions[axis_ring_2[1]] + self.positions[axis_ring_2[0]]) / 2.0
-        rotor_2_relative_positions = self.positions[ring_2] - axis_2_center
-        rotor_2_cross_product = np.cross(rotor_2_relative_positions, axis_2_vector)
+        # axis_4_vector = geometry.find_mic(axis_4_vector, self.get_cell()) [0]
+        # axis_4_center = geometry.find_mic(axis_4_center, self.get_cell()) [0]
+        # rotor_4_relative_positions = geometry.find_mic(rotor_4_relative_positions, self.get_cell()) [0]
+        # rotor_4_cross_product = geometry.find_mic(rotor_4_cross_product, self.get_cell()) [0]
 
-        axis_3_vector = self.positions[axis_ring_3[1]] - self.positions[axis_ring_3[0]]
-        axis_3_center = (self.positions[axis_ring_3[1]] + self.positions[axis_ring_3[0]]) / 2.0
-        rotor_3_relative_positions = self.positions[ring_3] - axis_3_center
-        rotor_3_cross_product = np.cross(rotor_3_relative_positions, axis_3_vector)
+        # axis_5_vector = geometry.find_mic(axis_5_vector, self.get_cell()) [0]
+        # axis_5_center = geometry.find_mic(axis_5_center, self.get_cell()) [0]
+        # rotor_5_relative_positions = geometry.find_mic(rotor_5_relative_positions, self.get_cell()) [0]
+        # rotor_5_cross_product = geometry.find_mic(rotor_5_cross_product, self.get_cell()) [0]
 
-        axis_4_vector = self.positions[axis_ring_4[1]] - self.positions[axis_ring_4[0]]
-        axis_4_center = (self.positions[axis_ring_4[1]] + self.positions[axis_ring_4[0]]) / 2.0
-        rotor_4_relative_positions = self.positions[ring_4] - axis_4_center
-        rotor_4_cross_product = np.cross(rotor_4_relative_positions, axis_4_vector)
+        # axis_6_vector = geometry.find_mic(axis_6_vector, self.get_cell()) [0]
+        # axis_6_center = geometry.find_mic(axis_6_center, self.get_cell()) [0]
+        # rotor_6_relative_positions = geometry.find_mic(rotor_6_relative_positions, self.get_cell()) [0]
+        # rotor_6_cross_product = geometry.find_mic(rotor_6_cross_product, self.get_cell()) [0]
 
-        axis_5_vector = self.positions[axis_ring_5[1]] - self.positions[axis_ring_5[0]]
-        axis_5_center = (self.positions[axis_ring_5[1]] + self.positions[axis_ring_5[0]]) / 2.0
-        rotor_5_relative_positions = self.positions[ring_5] - axis_5_center
-        rotor_5_cross_product = np.cross(rotor_5_relative_positions, axis_5_vector)
+        # axis_A_vector = geometry.find_mic(axis_A_vector, self.get_cell()) [0]
+        # axis_A_center = geometry.find_mic(axis_A_center, self.get_cell()) [0]
+        # rotor_A_relative_positions = geometry.find_mic(rotor_A_relative_positions, self.get_cell()) [0]
+        # rotor_A_cross_product = geometry.find_mic(rotor_A_cross_product, self.get_cell()) [0]
 
-        axis_6_vector = self.positions[axis_ring_6[1]] - self.positions[axis_ring_6[0]]
-        axis_6_center = (self.positions[axis_ring_6[1]] + self.positions[axis_ring_6[0]]) / 2.0
-        rotor_6_relative_positions = self.positions[ring_6] - axis_6_center
-        rotor_6_cross_product = np.cross(rotor_6_relative_positions, axis_6_vector)
+        # axis_B_vector = geometry.find_mic(axis_B_vector, self.get_cell()) [0]
+        # axis_B_center = geometry.find_mic(axis_B_center, self.get_cell()) [0]
+        # rotor_B_relative_positions = geometry.find_mic(rotor_B_relative_positions, self.get_cell()) [0]
+        # rotor_B_cross_product = geometry.find_mic(rotor_B_cross_product, self.get_cell()) [0]
 
-        axis_A_vector = self.positions[axis_ring_A[1]] - self.positions[axis_ring_A[0]]
-        axis_A_center = (self.positions[axis_ring_A[1]] + self.positions[axis_ring_A[0]]) / 2.0
-        rotor_A_relative_positions = self.positions[ring_A] - axis_A_center
-        rotor_A_cross_product = np.cross(rotor_A_relative_positions, axis_A_vector)
+        # axis_C_vector = geometry.find_mic(axis_C_vector, self.get_cell()) [0]
+        # axis_C_center = geometry.find_mic(axis_C_center, self.get_cell()) [0]
+        # rotor_C_relative_positions = geometry.find_mic(rotor_C_relative_positions, self.get_cell()) [0]
+        # rotor_C_cross_product = geometry.find_mic(rotor_C_cross_product, self.get_cell()) [0]
 
-        axis_B_vector = self.positions[axis_ring_B[1]] - self.positions[axis_ring_B[0]]
-        axis_B_center = (self.positions[axis_ring_B[1]] + self.positions[axis_ring_B[0]]) / 2.0
-        rotor_B_relative_positions = self.positions[ring_B] - axis_B_center
-        rotor_B_cross_product = np.cross(rotor_B_relative_positions, axis_B_vector)
+        # axis_D_vector = geometry.find_mic(axis_D_vector, self.get_cell()) [0]
+        # axis_D_center = geometry.find_mic(axis_D_center, self.get_cell()) [0]
+        # rotor_D_relative_positions = geometry.find_mic(rotor_D_relative_positions, self.get_cell()) [0]
+        # rotor_D_cross_product = geometry.find_mic(rotor_D_cross_product, self.get_cell()) [0]
 
-        axis_C_vector = self.positions[axis_ring_C[1]] - self.positions[axis_ring_C[0]]
-        axis_C_center = (self.positions[axis_ring_C[1]] + self.positions[axis_ring_C[0]]) / 2.0
-        rotor_C_relative_positions = self.positions[ring_C] - axis_C_center
-        rotor_C_cross_product = np.cross(rotor_C_relative_positions, axis_C_vector)
+        # axis_E_vector = geometry.find_mic(axis_E_vector, self.get_cell()) [0]
+        # axis_E_center = geometry.find_mic(axis_E_center, self.get_cell()) [0]
+        # rotor_E_relative_positions = geometry.find_mic(rotor_E_relative_positions, self.get_cell()) [0]
+        # rotor_E_cross_product = geometry.find_mic(rotor_E_cross_product, self.get_cell()) [0]
 
-        axis_D_vector = self.positions[axis_ring_D[1]] - self.positions[axis_ring_D[0]]
-        axis_D_center = (self.positions[axis_ring_D[1]] + self.positions[axis_ring_D[0]]) / 2.0
-        rotor_D_relative_positions = self.positions[ring_D] - axis_D_center
-        rotor_D_cross_product = np.cross(rotor_D_relative_positions, axis_D_vector)
+        # axis_F_vector = geometry.find_mic(axis_F_vector, self.get_cell()) [0]
+        # axis_F_center = geometry.find_mic(axis_F_center, self.get_cell()) [0]
+        # rotor_F_relative_positions = geometry.find_mic(rotor_F_relative_positions, self.get_cell()) [0]
+        # rotor_F_cross_product = geometry.find_mic(rotor_F_cross_product, self.get_cell()) [0]
 
-        axis_E_vector = self.positions[axis_ring_E[1]] - self.positions[axis_ring_E[0]]
-        axis_E_center = (self.positions[axis_ring_E[1]] + self.positions[axis_ring_E[0]]) / 2.0
-        rotor_E_relative_positions = self.positions[ring_E] - axis_E_center
-        rotor_E_cross_product = np.cross(rotor_E_relative_positions, axis_E_vector)
 
-        axis_F_vector = self.positions[axis_ring_F[1]] - self.positions[axis_ring_F[0]]
-        axis_F_center = (self.positions[axis_ring_F[1]] + self.positions[axis_ring_F[0]]) / 2.0
-        rotor_F_relative_positions = self.positions[ring_F] - axis_F_center
-        rotor_F_cross_product = np.cross(rotor_F_relative_positions, axis_F_vector)
+        
+        # forces_torque_1 = rotor_1_cross_product * self.forces_alpha[0]
+        # forces_torque_2 = rotor_2_cross_product * self.forces_alpha[1]
+        # forces_torque_3 = rotor_3_cross_product * self.forces_alpha[2]
+        # forces_torque_4 = rotor_4_cross_product * self.forces_alpha[3]
+        # forces_torque_5 = rotor_5_cross_product * self.forces_alpha[4]
+        # forces_torque_6 = rotor_6_cross_product * self.forces_alpha[5]
 
+        # forces_torque_A = rotor_A_cross_product * self.forces_alpha[6]
+        # forces_torque_B = rotor_B_cross_product * self.forces_alpha[7]
+        # forces_torque_C = rotor_C_cross_product * self.forces_alpha[8]
+        # forces_torque_D = rotor_D_cross_product * self.forces_alpha[9]
+        # forces_torque_E = rotor_E_cross_product * self.forces_alpha[10]
+        # forces_torque_F = rotor_F_cross_product * self.forces_alpha[11]
+
+
+        # forces[ring_1 ] += forces_torque_1
+        # forces[ring_2 ] += forces_torque_2
+        # forces[ring_3 ] += forces_torque_3
+        # forces[ring_4 ] += forces_torque_4
+        # forces[ring_5 ] += forces_torque_5
+        # forces[ring_6 ] += forces_torque_6
+
+        # forces[ring_A ] += forces_torque_A
+        # forces[ring_B ] += forces_torque_B
+        # forces[ring_C ] += forces_torque_C
+        # forces[ring_D ] += forces_torque_D
+        # forces[ring_E ] += forces_torque_E
+        # forces[ring_F ] += forces_torque_F
+
+        axis_vector = self.positions[axis_test[1]] - self.positions[axis_test[0]]
+        axis_center = (self.positions[axis_test[1]] + self.positions[axis_test[0]]) / 2.0
+        rotor_relative_positions = self.positions[ring_test] - axis_center
+        rotor_cross_product = np.cross(rotor_relative_positions, axis_vector)
 
         #correct for periodic boundary conditions:
-        axis_1_vector = geometry.find_mic(axis_1_vector, self.get_cell()) [0]
-        axis_1_center = geometry.find_mic(axis_1_center, self.get_cell()) [0]
-        rotor_1_relative_positions = geometry.find_mic(rotor_1_relative_positions, self.get_cell()) [0]
-        rotor_1_cross_product = geometry.find_mic(rotor_1_cross_product, self.get_cell()) [0]
+        axis_vector = geometry.find_mic(axis_vector, self.get_cell()) [0]
+        axis_center = geometry.find_mic(axis_center, self.get_cell()) [0]
+        rotor_relative_positions = geometry.find_mic(rotor_relative_positions, self.get_cell()) [0]
+        rotor_cross_product = geometry.find_mic(rotor_cross_product, self.get_cell()) [0]
 
-        axis_2_vector = geometry.find_mic(axis_2_vector, self.get_cell()) [0]
-        axis_2_center = geometry.find_mic(axis_2_center, self.get_cell()) [0]
-        rotor_2_relative_positions = geometry.find_mic(rotor_2_relative_positions, self.get_cell()) [0]
-        rotor_2_cross_product = geometry.find_mic(rotor_2_cross_product, self.get_cell()) [0]
-
-        axis_3_vector = geometry.find_mic(axis_3_vector, self.get_cell()) [0]
-        axis_3_center = geometry.find_mic(axis_3_center, self.get_cell()) [0]
-        rotor_3_relative_positions = geometry.find_mic(rotor_3_relative_positions, self.get_cell()) [0]
-        rotor_3_cross_product = geometry.find_mic(rotor_3_cross_product, self.get_cell()) [0]
-
-        axis_4_vector = geometry.find_mic(axis_4_vector, self.get_cell()) [0]
-        axis_4_center = geometry.find_mic(axis_4_center, self.get_cell()) [0]
-        rotor_4_relative_positions = geometry.find_mic(rotor_4_relative_positions, self.get_cell()) [0]
-        rotor_4_cross_product = geometry.find_mic(rotor_4_cross_product, self.get_cell()) [0]
-
-        axis_5_vector = geometry.find_mic(axis_5_vector, self.get_cell()) [0]
-        axis_5_center = geometry.find_mic(axis_5_center, self.get_cell()) [0]
-        rotor_5_relative_positions = geometry.find_mic(rotor_5_relative_positions, self.get_cell()) [0]
-        rotor_5_cross_product = geometry.find_mic(rotor_5_cross_product, self.get_cell()) [0]
-
-        axis_6_vector = geometry.find_mic(axis_6_vector, self.get_cell()) [0]
-        axis_6_center = geometry.find_mic(axis_6_center, self.get_cell()) [0]
-        rotor_6_relative_positions = geometry.find_mic(rotor_6_relative_positions, self.get_cell()) [0]
-        rotor_6_cross_product = geometry.find_mic(rotor_6_cross_product, self.get_cell()) [0]
-
-        axis_A_vector = geometry.find_mic(axis_A_vector, self.get_cell()) [0]
-        axis_A_center = geometry.find_mic(axis_A_center, self.get_cell()) [0]
-        rotor_A_relative_positions = geometry.find_mic(rotor_A_relative_positions, self.get_cell()) [0]
-        rotor_A_cross_product = geometry.find_mic(rotor_A_cross_product, self.get_cell()) [0]
-
-        axis_B_vector = geometry.find_mic(axis_B_vector, self.get_cell()) [0]
-        axis_B_center = geometry.find_mic(axis_B_center, self.get_cell()) [0]
-        rotor_B_relative_positions = geometry.find_mic(rotor_B_relative_positions, self.get_cell()) [0]
-        rotor_B_cross_product = geometry.find_mic(rotor_B_cross_product, self.get_cell()) [0]
-
-        axis_C_vector = geometry.find_mic(axis_C_vector, self.get_cell()) [0]
-        axis_C_center = geometry.find_mic(axis_C_center, self.get_cell()) [0]
-        rotor_C_relative_positions = geometry.find_mic(rotor_C_relative_positions, self.get_cell()) [0]
-        rotor_C_cross_product = geometry.find_mic(rotor_C_cross_product, self.get_cell()) [0]
-
-        axis_D_vector = geometry.find_mic(axis_D_vector, self.get_cell()) [0]
-        axis_D_center = geometry.find_mic(axis_D_center, self.get_cell()) [0]
-        rotor_D_relative_positions = geometry.find_mic(rotor_D_relative_positions, self.get_cell()) [0]
-        rotor_D_cross_product = geometry.find_mic(rotor_D_cross_product, self.get_cell()) [0]
-
-        axis_E_vector = geometry.find_mic(axis_E_vector, self.get_cell()) [0]
-        axis_E_center = geometry.find_mic(axis_E_center, self.get_cell()) [0]
-        rotor_E_relative_positions = geometry.find_mic(rotor_E_relative_positions, self.get_cell()) [0]
-        rotor_E_cross_product = geometry.find_mic(rotor_E_cross_product, self.get_cell()) [0]
-
-        axis_F_vector = geometry.find_mic(axis_F_vector, self.get_cell()) [0]
-        axis_F_center = geometry.find_mic(axis_F_center, self.get_cell()) [0]
-        rotor_F_relative_positions = geometry.find_mic(rotor_F_relative_positions, self.get_cell()) [0]
-        rotor_F_cross_product = geometry.find_mic(rotor_F_cross_product, self.get_cell()) [0]
+        forces_torque = rotor_cross_product * self.forces_alpha[0]
+        forces[ring_test ] += forces_torque
 
 
-        
-        forces_torque_1 = rotor_1_cross_product * self.forces_alpha[0]
-        forces_torque_2 = rotor_2_cross_product * self.forces_alpha[1]
-        forces_torque_3 = rotor_3_cross_product * self.forces_alpha[2]
-        forces_torque_4 = rotor_4_cross_product * self.forces_alpha[3]
-        forces_torque_5 = rotor_5_cross_product * self.forces_alpha[4]
-        forces_torque_6 = rotor_6_cross_product * self.forces_alpha[5]
 
-        forces_torque_A = rotor_A_cross_product * self.forces_alpha[6]
-        forces_torque_B = rotor_B_cross_product * self.forces_alpha[7]
-        forces_torque_C = rotor_C_cross_product * self.forces_alpha[8]
-        forces_torque_D = rotor_D_cross_product * self.forces_alpha[9]
-        forces_torque_E = rotor_E_cross_product * self.forces_alpha[10]
-        forces_torque_F = rotor_F_cross_product * self.forces_alpha[11]
-
-
-        forces[ring_1 ] += forces_torque_1
-        forces[ring_2 ] += forces_torque_2
-        forces[ring_3 ] += forces_torque_3
-        forces[ring_4 ] += forces_torque_4
-        forces[ring_5 ] += forces_torque_5
-        forces[ring_6 ] += forces_torque_6
-
-        forces[ring_A ] += forces_torque_A
-        forces[ring_B ] += forces_torque_B
-        forces[ring_C ] += forces_torque_C
-        forces[ring_D ] += forces_torque_D
-        forces[ring_E ] += forces_torque_E
-        forces[ring_F ] += forces_torque_F
-
-        # ic(forces[ring_1])
-        # ic(rotor_1_cross_product)
-        # ic(rotor_2_cross_product)
-        # ic(rotor_3_cross_product)
-        # ic(rotor_4_cross_product)
-        # ic(rotor_5_cross_product)
-        # ic(rotor_6_cross_product)
-        # ic(rotor_A_cross_product)
-        # ic(rotor_B_cross_product)
-        # ic(rotor_C_cross_product)
-        # ic(rotor_D_cross_product)
-        # ic(rotor_E_cross_product)
-        # ic(rotor_F_cross_product)
-
-        # ic(self.positions[ring_1])
-        # ic(self.positions[ring_2])
-        # ic(self.positions[ring_3])
-        # ic(self.positions[ring_4])
-        # ic(self.positions[ring_5])
-        # ic(self.positions[ring_6])
-        # ic(self.positions[ring_A])
-        # ic(self.positions[ring_B])
-        # ic(self.positions[ring_C])
-        # ic(self.positions[ring_D])
-        # ic(self.positions[ring_E])
-        # ic(self.positions[ring_F])
-
-        # forces[198] = 100.0 * forces[198]
-                  
-
-        # self.traj.append(self.copy())
-
-        # if self.calc_history_counter % 5 == 0:
-        #     from ase.visualize import view
-        #     view(self.traj)
-        
-        # view(self[ring_1_full])
-        # view(self[ring_2_full])
-        # view(self[ring_3_full])
-        # view(self[ring_4_full])
-        # view(self[ring_5_full])
-        # view(self[ring_6_full])
-            # input("Press Enter to continue...")
-        # ic(self.get_chemical_symbols())
-
-        # ic(self.get_cell())
-
-        # self.wrap()
-        # from ase import io
-        # io.write("/home/dlbox2/repos/rotor-gp/code/pimd/355K_dftb_1/sample_crystal.xyz", self, format="extxyz")
-        # input("Press Enter to continue...")
-        # crys = io.read("/home/dlbox2/repos/rotor-gp/code/pimd/355K_dftb_1/sample_crystal.xyz", format="extxyz")
-        # view(crys)
 
         self.calc_history_counter += 1
         return forces
