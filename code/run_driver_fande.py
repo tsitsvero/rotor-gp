@@ -140,7 +140,7 @@ soap_params = {
 #### for rotors
 from ase import io
 
-STRUCTURE="355K"
+STRUCTURE="295K"
 
 if STRUCTURE == "295K":
     # crystal = io.read( os.path.expanduser("/home/qklmn/data/starting_configuration/triazine/295optdftb.cif"), format="cif" )
@@ -266,14 +266,21 @@ class RotationAtomsWrapper(Atoms):
     def __init__(self, *args, **kwargs):
         super(RotationAtomsWrapper, self).__init__(*args, **kwargs)      
         self.calc_history_counter = 0
-        self.forces_alpha = [0.0, -0.0, -0.0, 0.0, -0.0, -0.0,   -0.0, 0.0, 0.0,  -0.0, 0.0, 0.075]    #[0.05] * 12
+        # self.forces_alpha = [0.06, -0.06, -0.06, 0.06, -0.06, -0.06,   -0.06, 0.06, 0.06,  -0.06, 0.06, 0.06]    #[0.05] * 12
+        self.forces_alpha = [0.0, -0.0, -0.0, 0.0, -0.0, -0.0,   -0.0, 0.0, 0.0,  -0.0, 0.0, 0.0]    #[0.05] * 12
 
         self.traj = []
 
-        self.previous_atoms = None
+        self.stress = None
+
+    # def get_stress(self, apply_constraint=True):
+    #     # stress = super(RotationAtomsWrapper, self).get_stress(apply_constraint=apply_constraint)
+    #     ic("Calculation of STRESS requested!")
+    #     return self.stress
 
     def get_forces(self, md=False):       
         forces = super(RotationAtomsWrapper, self).get_forces(md=md)
+        # self.arrays['stress'] = super(RotationAtomsWrapper, self).get_stress()
         # energy = super(AtomsWrapped, self).get_potential_energy()
         # os.makedirs("ase_calc_history" , exist_ok=True)
         # write( "ase_calc_history/" + str(self.calc_history_counter) + ".xyz", self, format="extxyz")
@@ -525,7 +532,7 @@ def make_client(i, gpu_id_list):
             Hamiltonian_MaxAngularMomentum_C='p',
             Hamiltonian_MaxAngularMomentum_Si='d',
             kpts=(1,1,1),
-            Hamiltonian_SCC='Yes',
+            # Hamiltonian_SCC='Yes',
             # Verbosity=0,
             # Hamiltonian_OrbitalResolvedSCC = 'Yes',
             # Hamiltonian_SCCTolerance=1e-15,
@@ -538,11 +545,12 @@ def make_client(i, gpu_id_list):
             #     Driver_='',
             #     Driver_Socket_='',
             #     Driver_Socket_File='Hello'
+            # Driver_Socket_Port=pimd_port
             )
 
     atoms_copy.set_calculator(calc)
 
-    print( atoms_copy.get_forces() )
+    print( atoms_copy.get_stress() )
 
     print("Calculator is set up!")
     # print( atoms_copy.get_forces() )
@@ -552,7 +560,7 @@ def make_client(i, gpu_id_list):
     port = pimd_port
     host = "localhost"
     client = SocketClient(host=host, port=port)
-    client.run(atoms_copy)
+    client.run(atoms_copy, use_stress=True) # for NPT set use_stress=True!
 
     return 0
 
