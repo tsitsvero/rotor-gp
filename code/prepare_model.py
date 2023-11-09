@@ -286,11 +286,11 @@ def sample_data(fdm, N_samples):
         # hparams['train_indices'] = fdm.train_indices
 
 
-        return train_data_loaders
+        return train_data_loaders, atomic_groups
 
 
 
-def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_rate, gpu_id):
+def prepare_model(train_data_loaders, atomic_groups, hparams, soap_params, n_steps, learning_rate, gpu_id):
 
         # lr = learning_rate
 
@@ -307,6 +307,11 @@ def prepare_model(train_data_loaders, hparams, soap_params, n_steps, learning_ra
         import logging
 
         logging.getLogger("pytorch_lightning").setLevel(logging.INFO) # logging.ERROR to disable or INFO
+
+        models_hparams = []
+
+        # for i
+
 
         model_H_1_hparams = {
         'atomic_group' : ind_H_1,
@@ -666,9 +671,9 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
         fdm = prepare_data(hparams, soap_params, traj_sample_rate=1)
 
-        train_data_loaders = sample_data(fdm, N_samples=7_200)
+        train_data_loaders, atomic_groups = sample_data(fdm, N_samples=7_200)
 
-        AG_force_model = prepare_model(train_data_loaders, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
+        AG_force_model = prepare_model(train_data_loaders, atomic_groups, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
 
         test_performance(hparams, soap_params, AG_force_model, fdm) # check if working?
 
