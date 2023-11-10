@@ -76,7 +76,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
 
         def make_calc_dir():
                 if os.getcwd()[-4:] != 'code':
-                        os.chdir('/home/qklmn/repos/rotor-gp/code')
+                        os.chdir(os.path.expandvars('/home/$USER/repos/rotor-gp/code') )
                 dir_name = f'{datetime.now().strftime("%Y-%m-%d_%H %M-%S_%f")}'
                 dir_name = '../results/train_and_run/' + dir_name
                 os.makedirs(dir_name, exist_ok=True)
@@ -100,8 +100,8 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
 
         # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-        data_folder = "/home/qklmn/data/"
-        # data_folder = "/data1/simulations/"
+        # data_folder = "/home/qklmn/data/"
+        data_folder = "/data1/simulations/"
 
         print("Loading training data...")
         # traj_300 = io.read("/data1/simulations/datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
@@ -114,15 +114,19 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # print(len(traj_300), len(traj_600), len(traj_900), len(traj_1200), len(traj_1500), len(traj_1800), len(traj_2100))
 
 
-        traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
+        # traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
         # traj_600 = io.read(data_folder + "datasets/rotors/different_temperatures/600/OUTCAR", format="vasp-out", index = ":")
         # traj_900 = io.read(data_folder + "datasets/rotors/different_temperatures/900/OUTCAR", format="vasp-out", index = ":")
         # traj_1200 = io.read(data_folder + "datasets/rotors/different_temperatures/1200/OUTCAR", format="vasp-out", index = ":")
         # traj_1500 = io.read(data_folder + "datasets/rotors/different_temperatures/1500/OUTCAR", format="vasp-out", index = ":")
         # traj_1800 = io.read(data_folder + "datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
+        # traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
+
+        traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
         traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 
-        sample_snapshot = traj_2100[0]
+
+        sample_snapshot = traj_300[0]
 
         # traj_dftb_300 = io.read("/home/qklmn/data/datasets/rotors/different_temperatures/dftb/traj_300.traj", index = ":")
         # traj_dftb_2100 = io.read("/home/qklmn/data/datasets/rotors/different_temperatures/dftb/traj_2100.traj", index = ":")
@@ -131,7 +135,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
         # traj_train = traj_dftb_2100[100:500].copy()
 
-        traj_train = traj_2100[100:500].copy()
+        traj_train = traj_2100[100:110].copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
         # print("Length of the train trajectory: ", len(traj_train))
@@ -166,31 +170,35 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
 
 
         # atomic_groups = [ind_H_1, ind_H_2, ind_H_3, ind_H_4, ind_C_1, ind_C_2, ind_C_3, ind_C_4, ind_C_5, ind_C_6, ind_C_7, ind_N_1, ind_O_1, ind_Si_1] 
-        atomic_groups = find_atomic_groups(sample_snapshot)
-
-        train_centers_positions = sum(atomic_groups, []) #list(range(len(atoms)))
-        train_derivatives_positions = sum(atomic_groups, [])#list(range(len(atoms)))
 
 
         fdm = FandeDataModuleASE(train_data, test_data, hparams)
+        atomic_groups = find_atomic_groups(sample_snapshot)
+        train_centers_positions = sum(atomic_groups, []) #list(range(len(atoms)))
+        train_derivatives_positions = sum(atomic_groups, [])#list(range(len(atoms)))
+        fdm.atomic_groups = atomic_groups
+
+
+        # from ase.visualize import view
+        # view(sample_snapshot)
 
         fdm.calculate_invariants_librascal(
-        soap_params,
-        atomic_groups = atomic_groups,
-        centers_positions = train_centers_positions, 
-        derivatives_positions = train_derivatives_positions,
-        same_centers_derivatives=True,
-        frames_per_batch=1,
-        calculation_context="train")
+                soap_params,
+                atomic_groups = atomic_groups,
+                centers_positions = train_centers_positions, 
+                derivatives_positions = train_derivatives_positions,
+                same_centers_derivatives=True,
+                frames_per_batch=1,
+                calculation_context="train")
 
         fdm.calculate_invariants_librascal(
-        soap_params,
-        atomic_groups = atomic_groups,
-        centers_positions = train_centers_positions, 
-        derivatives_positions = train_derivatives_positions,
-        same_centers_derivatives=True,
-        frames_per_batch=1,
-        calculation_context="test")
+                soap_params,
+                atomic_groups = atomic_groups,
+                centers_positions = train_centers_positions, 
+                derivatives_positions = train_derivatives_positions,
+                same_centers_derivatives=True,
+                frames_per_batch=1,
+                calculation_context="test")
 
 
 
@@ -286,11 +294,11 @@ def sample_data(fdm, N_samples):
         # hparams['train_indices'] = fdm.train_indices
 
 
-        return train_data_loaders, atomic_groups
+        return train_data_loaders
 
 
 
-def prepare_model(train_data_loaders, atomic_groups, hparams, soap_params, n_steps, learning_rate, gpu_id):
+def prepare_model(fdm, train_data_loaders, hparams, soap_params, n_steps, learning_rate, gpu_id):
 
         # lr = learning_rate
 
@@ -304,325 +312,47 @@ def prepare_model(train_data_loaders, atomic_groups, hparams, soap_params, n_ste
         else:
                 lr_list = [learning_rate] * 14
 
+        atomic_groups = fdm.atomic_groups
+
         import logging
 
         logging.getLogger("pytorch_lightning").setLevel(logging.INFO) # logging.ERROR to disable or INFO
 
         models_hparams = []
 
-        # for i
+        for i in range(len(atomic_groups)):
+                model_hparams = {
+                'atomic_group' : atomic_groups[i],
+                'dtype' : hparams['dtype'],
+                'device' : hparams['device'],
+                'num_epochs' : n_steps_list[i],
+                'learning_rate' : lr_list[i],
+                'soap_dim' : train_data_loaders[i].dataset[0][0].shape[-1],
+                'soap_params' : soap_params,
+                }
+                models_hparams.append(model_hparams)
 
 
-        model_H_1_hparams = {
-        'atomic_group' : ind_H_1,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[0],
-        'learning_rate' : lr_list[0],
-        'soap_dim' : train_data_loaders[0].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
 
-        model_H_2_hparams = {
-        'atomic_group' : ind_H_2,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[1],
-        'learning_rate' : lr_list[1],
-        'soap_dim' : train_data_loaders[1].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        model_H_3_hparams = {
-        'atomic_group' : ind_H_3,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[2],
-        'learning_rate' : lr_list[2],
-        'soap_dim' : train_data_loaders[2].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        model_H_4_hparams = {
-        'atomic_group' : ind_H_4,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[3],
-        'learning_rate' : lr_list[3],
-        'soap_dim' : train_data_loaders[3].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        hparams_models_H = [model_H_1_hparams, model_H_2_hparams, model_H_3_hparams, model_H_4_hparams]
-
-        model_C_1_hparams = {
-        'atomic_group' : ind_C_1,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[4],
-        'learning_rate' : lr_list[4],
-        'soap_dim' : train_data_loaders[4].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        model_C_2_hparams = {
-        'atomic_group' : ind_C_2,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[5],
-        'learning_rate' : lr_list[5],
-        'soap_dim' : train_data_loaders[5].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        model_C_3_hparams = {
-        'atomic_group' : ind_C_3,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[6],
-        'learning_rate' : lr_list[6],
-        'soap_dim' : train_data_loaders[6].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        model_C_4_hparams = {
-        'atomic_group' : ind_C_4,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[7],
-        'learning_rate' : lr_list[7],
-        'soap_dim' : train_data_loaders[7].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        model_C_5_hparams = {
-        'atomic_group' : ind_C_5,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[8],
-        'learning_rate' : lr_list[8],
-        'soap_dim' : train_data_loaders[8].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        model_C_6_hparams = {
-        'atomic_group' : ind_C_6,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[9],
-        'learning_rate' : lr_list[9],
-        'soap_dim' : train_data_loaders[9].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        model_C_7_hparams = {
-        'atomic_group' : ind_C_7,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[10],
-        'learning_rate' : lr_list[10],
-        'soap_dim' : train_data_loaders[10].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-
-        hparams_models_C =  [model_C_1_hparams, model_C_2_hparams, model_C_3_hparams, model_C_4_hparams, model_C_5_hparams,  model_C_6_hparams,  model_C_7_hparams]
-
-        model_N_1_hparams = {
-        'atomic_group' : ind_N_1,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[11],
-        'learning_rate' : lr_list[11],
-        'soap_dim' : train_data_loaders[11].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        hparams_models_N =  [model_N_1_hparams]
-
-        model_O_1_hparams = {
-        'atomic_group' : ind_O_1,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[12],
-        'learning_rate' : lr_list[12],
-        'soap_dim' : train_data_loaders[12].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        hparams_models_O =  [model_O_1_hparams]
-
-
-        model_Si_1_hparams = {
-        'atomic_group' : ind_Si_1,
-        'dtype' : hparams['dtype'],
-        'device' : hparams['device'],
-        'num_epochs' : n_steps_list[13],
-        'learning_rate' : lr_list[13],
-        'soap_dim' : train_data_loaders[13].dataset[0][0].shape[-1],
-        'soap_params' : soap_params,
-        }
-
-        hparams_models_Si =  [model_Si_1_hparams]
-
-        # model_Si_hparams = {
-        #     'atomic_group' : Si_atoms,
-        #     'dtype' : hparams['dtype'],
-        #     'device' : hparams['device'],
-        #     'num_epochs' : 1, 
-        #     'learning_rate' : 0.01,
-        #     'soap_dim' : fdm.train_DX[1].shape[-1],
-        #     'soap_params' : soap_params,
-        # }
-
-
-        hparams['per_model_hparams'] = [ 
-        model_H_1_hparams,
-        model_H_2_hparams,
-        model_H_3_hparams,
-        model_H_4_hparams, 
-        model_C_1_hparams,
-        model_C_2_hparams,
-        model_C_3_hparams,
-        model_C_4_hparams,
-        model_C_5_hparams,
-        model_C_6_hparams,
-        model_C_7_hparams,
-        model_N_1_hparams,
-        model_O_1_hparams,
-        model_Si_1_hparams
-        ] # access per_model_hparams by model.model_id
-
-        # hparams['soap_dim'] = fdm.train_DX[0].shape[-1]
+        hparams['per_model_hparams'] = models_hparams # access per_model_hparams by model.model_id
 
 
         #####################################################################
 
         from fande.models import ModelForces, GroupModelForces, ModelEnergies, MyCallbacks
 
-        model_H_1 = ModelForces(
-        train_x = train_data_loaders[0].dataset[:][0],
-        train_y = train_data_loaders[0].dataset[:][1],
-        atomic_group = ind_H_1,
-        hparams = hparams,
-        id=0)
-
-        model_H_2 = ModelForces(
-        train_x = train_data_loaders[1].dataset[:][0],
-        train_y = train_data_loaders[1].dataset[:][1],
-        atomic_group = ind_H_2,
-        hparams = hparams,
-        id=1)
-
-        model_H_3 = ModelForces(
-        train_x = train_data_loaders[2].dataset[:][0],
-        train_y = train_data_loaders[2].dataset[:][1],
-        atomic_group = ind_H_3,
-        hparams = hparams,
-        id=2)
-
-        model_H_4 = ModelForces(
-        train_x = train_data_loaders[3].dataset[:][0],
-        train_y = train_data_loaders[3].dataset[:][1],
-        atomic_group = ind_H_4,
-        hparams = hparams,
-        id=3)
-
-
-
-        model_C_1 = ModelForces(
-        train_x = train_data_loaders[4].dataset[:][0],
-        train_y = train_data_loaders[4].dataset[:][1],
-        atomic_group = ind_C_1,
-        hparams = hparams,
-        id=4)
-
-        model_C_2 = ModelForces(
-        train_x = train_data_loaders[5].dataset[:][0],
-        train_y = train_data_loaders[5].dataset[:][1],
-        atomic_group = ind_C_2,
-        hparams = hparams,
-        id=5)
-
-        model_C_3 = ModelForces(
-        train_x = train_data_loaders[6].dataset[:][0],
-        train_y = train_data_loaders[6].dataset[:][1],
-        atomic_group = ind_C_3,
-        hparams = hparams,
-        id=6)
-
-        model_C_4 = ModelForces(
-        train_x = train_data_loaders[7].dataset[:][0],
-        train_y = train_data_loaders[7].dataset[:][1],
-        atomic_group = ind_C_4,
-        hparams = hparams,
-        id=7)
-
-        model_C_5 = ModelForces(
-        train_x = train_data_loaders[8].dataset[:][0],
-        train_y = train_data_loaders[8].dataset[:][1],
-        atomic_group = ind_C_5,
-        hparams = hparams,
-        id=8)
-
-        model_C_6 = ModelForces(
-        train_x = train_data_loaders[9].dataset[:][0],
-        train_y = train_data_loaders[9].dataset[:][1],
-        atomic_group = ind_C_6,
-        hparams = hparams,
-        id=9)
-
-        model_C_7 = ModelForces(
-        train_x = train_data_loaders[10].dataset[:][0],
-        train_y = train_data_loaders[10].dataset[:][1],
-        atomic_group = ind_C_7,
-        hparams = hparams,
-        id=10)
-
-
-
-        model_N_1 = ModelForces(
-        train_x = train_data_loaders[11].dataset[:][0],
-        train_y = train_data_loaders[11].dataset[:][1],
-        atomic_group = ind_N_1,
-        hparams = hparams,
-        id=11)
-
-
-        model_O_1 = ModelForces(
-        train_x = train_data_loaders[12].dataset[:][0],
-        train_y = train_data_loaders[12].dataset[:][1],
-        atomic_group = ind_O_1,
-        hparams = hparams,
-        id=12)
-
-        model_Si_1 = ModelForces(
-        train_x = train_data_loaders[13].dataset[:][0],
-        train_y = train_data_loaders[13].dataset[:][1],
-        atomic_group = ind_Si_1,
-        hparams = hparams,
-        id=13)
-
-
-
-
+        models_forces = []
+        for i in range(len(atomic_groups)):
+                model = ModelForces(
+                train_x = train_data_loaders[i].dataset[:][0],
+                train_y = train_data_loaders[i].dataset[:][1],
+                atomic_group = atomic_groups[i],
+                hparams = hparams,
+                id=i)
+                models_forces.append(model)
+                
         AG_force_model = GroupModelForces(
-        models= [
-                model_H_1, 
-                model_H_2, 
-                model_H_3, 
-                model_H_4, 
-                model_C_1, 
-                model_C_2, 
-                model_C_3, 
-                model_C_4, 
-                model_C_5,
-                model_C_6, 
-                model_C_7, 
-                model_N_1,
-                model_O_1, 
-                model_Si_1,
-                ], # model_N, model_O, model_Si],
+        models= models_forces,
         train_data_loaders = train_data_loaders,
         hparams=hparams, 
         gpu_id=gpu_id)
@@ -671,9 +401,9 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
         fdm = prepare_data(hparams, soap_params, traj_sample_rate=1)
 
-        train_data_loaders, atomic_groups = sample_data(fdm, N_samples=7_200)
+        train_data_loaders = sample_data(fdm, N_samples=7_200)
 
-        AG_force_model = prepare_model(train_data_loaders, atomic_groups, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
+        AG_force_model = prepare_model(fdm, train_data_loaders, hparams, soap_params, 2, 0.01, gpu_id=gpu_id)
 
         test_performance(hparams, soap_params, AG_force_model, fdm) # check if working?
 
