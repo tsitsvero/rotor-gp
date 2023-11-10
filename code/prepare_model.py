@@ -128,7 +128,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         traj_295 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/2023-10-19_15%3A13%3A19.421698/md_trajectory.traj", index = ":")
         traj_2000 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/2023-10-19_15%3A10%3A59.497414/md_trajectory.traj",index = ":")
 
-        sample_snapshot = traj_295[0]
+        sample_snapshot = traj_2000[0]
 
         # traj_dftb_300 = io.read("/home/qklmn/data/datasets/rotors/different_temperatures/dftb/traj_300.traj", index = ":")
         # traj_dftb_2100 = io.read("/home/qklmn/data/datasets/rotors/different_temperatures/dftb/traj_2100.traj", index = ":")
@@ -137,7 +137,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
         # traj_train = traj_dftb_2100[100:500].copy()
 
-        traj_train = traj_2000[100:110].copy()
+        traj_train = traj_2000[100:1000].copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
         # print("Length of the train trajectory: ", len(traj_train))
@@ -406,7 +406,7 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
         train_data_loaders = sample_data(fdm, N_samples=7_200)
 
-        AG_force_model = prepare_model(fdm, train_data_loaders, hparams, soap_params, 2, 0.01, gpu_id=gpu_id)
+        AG_force_model = prepare_model(fdm, train_data_loaders, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
 
         test_performance(hparams, soap_params, AG_force_model, fdm) # check if working?
 
