@@ -122,11 +122,13 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_1800 = io.read(data_folder + "datasets/rotors/different_temperatures/1800/OUTCAR", format="vasp-out", index = ":")
         # traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 
-        traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
-        traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
+        # traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
+        # traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 
+        traj_295 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/2023-10-19_15%3A13%3A19.421698/md_trajectory.traj", index = ":")
+        traj_2000 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/2023-10-19_15%3A10%3A59.497414/md_trajectory.traj",index = ":")
 
-        sample_snapshot = traj_300[0]
+        sample_snapshot = traj_295[0]
 
         # traj_dftb_300 = io.read("/home/qklmn/data/datasets/rotors/different_temperatures/dftb/traj_300.traj", index = ":")
         # traj_dftb_2100 = io.read("/home/qklmn/data/datasets/rotors/different_temperatures/dftb/traj_2100.traj", index = ":")
@@ -135,7 +137,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
         # traj_train = traj_dftb_2100[100:500].copy()
 
-        traj_train = traj_2100[100:110].copy()
+        traj_train = traj_2000[100:110].copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
         # print("Length of the train trajectory: ", len(traj_train))
@@ -143,7 +145,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         print("Length of the train trajectory: ", len(traj_train))
 
 
-        traj_test = traj_300[400:420].copy()
+        traj_test = traj_295[400:420].copy()
         # traj_test = traj_dftb_300[400:420].copy()
         # test_indices = np.sort(  np.random.choice(np.arange(0,92795), 200, replace=False) ) 
         # test_indices = np.sort(  np.arange(400,410,1) ) 
@@ -176,6 +178,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         atomic_groups = find_atomic_groups(sample_snapshot)
         train_centers_positions = sum(atomic_groups, []) #list(range(len(atoms)))
         train_derivatives_positions = sum(atomic_groups, [])#list(range(len(atoms)))
+        fdm.atomic_groups_sample_snapshot = sample_snapshot.copy()
         fdm.atomic_groups = atomic_groups
 
 
