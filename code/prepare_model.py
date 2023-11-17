@@ -62,11 +62,6 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         import matplotlib.pyplot as plt
         import numpy as np
 
-        import sys
-        sys.path.append("../../fande")
-        sys.path.append("../../../fande")
-        # sys.path.append("../../fande") 
-        # sys.path.append("..") 
         import fande
         from fande.utils.find_atomic_groups import find_atomic_groups
 
@@ -137,7 +132,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
         # traj_train = traj_dftb_2100[100:500].copy()
 
-        traj_train = traj_2000[100:1000].copy()
+        traj_train = traj_2000[0:5000].copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
         # print("Length of the train trajectory: ", len(traj_train))
@@ -394,17 +389,13 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
         import wandb
         wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name, mode='disabled')
 
-        import sys
-        sys.path.append("../../fande")
-        sys.path.append("../../../fande")
-
         from fande.predict import PredictorASE
         from fande.ase import FandeCalc
 
 
         fdm = prepare_data(hparams, soap_params, traj_sample_rate=1)
 
-        train_data_loaders = sample_data(fdm, N_samples=7_200)
+        train_data_loaders = sample_data(fdm, N_samples=14_000)
 
         AG_force_model = prepare_model(fdm, train_data_loaders, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
 
