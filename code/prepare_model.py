@@ -120,10 +120,20 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_300 = io.read(data_folder + "datasets/rotors/different_temperatures/300/OUTCAR", format="vasp-out", index = ":")
         # traj_2100 = io.read(data_folder + "datasets/rotors/different_temperatures/2100/OUTCAR", format="vasp-out", index = ":")
 
-        traj_295 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/2023-10-19_15%3A13%3A19.421698/md_trajectory.traj", index = ":")
-        traj_2000 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/2023-10-19_15%3A10%3A59.497414/md_trajectory.traj",index = ":")
+        # traj_295 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/2023-10-19_15%3A13%3A19.421698/md_trajectory.traj", index = ":")
+        # traj_2000 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/2023-10-19_15%3A10%3A59.497414/md_trajectory.traj",index = ":")
 
-        sample_snapshot = traj_2000[0]
+
+        traj_295 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/struct_295_295K/md_trajectory.traj", index=":")
+        # traj_355 = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/struct_355_355K/md_trajectory.traj", index=":")
+
+        # traj_295_2000K = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/struct_295_2000K/md_trajectory.traj", index=":")
+        # traj_355_2000K = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/struct_355_2000K/md_trajectory.traj", index=":")
+        traj_295_2000K_forced = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/struct_295_2000K_0075force/md_trajectory.traj", index=":")
+        # traj_355_2000K_forced = io.read("/data1/simulations/datasets/rotors/high_temp_ML_training_data/results_triasine_ML_2000/struct_355_2000K_0075force/md_trajectory.traj", index=":")
+
+
+        sample_snapshot = traj_295_2000K_forced[0]
 
         # traj_dftb_300 = io.read("/home/qklmn/data/datasets/rotors/different_temperatures/dftb/traj_300.traj", index = ":")
         # traj_dftb_2100 = io.read("/home/qklmn/data/datasets/rotors/different_temperatures/dftb/traj_2100.traj", index = ":")
@@ -132,7 +142,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
         # traj_train = traj_dftb_2100[100:500].copy()
 
-        traj_train = traj_2000[0:5000].copy()
+        traj_train = traj_295_2000K_forced[0:5000].copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
         # print("Length of the train trajectory: ", len(traj_train))
@@ -395,7 +405,7 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
         fdm = prepare_data(hparams, soap_params, traj_sample_rate=1)
 
-        train_data_loaders = sample_data(fdm, N_samples=14_000)
+        train_data_loaders = sample_data(fdm, N_samples=7_200)
 
         AG_force_model = prepare_model(fdm, train_data_loaders, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
 
