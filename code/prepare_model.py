@@ -142,7 +142,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
         # traj_train = traj_dftb_2100[100:500].copy()
 
-        traj_train = traj_295_2000K_forced[0:5000].copy()
+        traj_train = traj_295_2000K_forced[0:5000:10].copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
         # print("Length of the train trajectory: ", len(traj_train))
@@ -278,28 +278,30 @@ def sample_data(fdm, N_samples):
         N_samples, # ind_Si_1 
         ]
 
-        high_force_samples_per_group = [
-        1000, # ind_H_1
-        1000, # ind_H_2
-        1000, # ind_H_3
-        1000, # ind_H_4    
-        1000, # ind_C_1
-        1000, # ind_C_2
-        1000, # ind_C_3
-        1000, # ind_C_4
-        1000, # ind_C_5
-        1000, # ind_C_6
-        1000, # ind_C_7
-        1000, # ind_N_1
-        1000, # ind_O_1
-        1000, # ind_Si_1
-        ]
+        N_high_force = 0
+
+        high_force_samples_per_group = [ N_high_force ] * 14
+
+        # high_force_samples_per_group = [
+        # 1000, # ind_H_1
+        # 1000, # ind_H_2
+        # 1000, # ind_H_3
+        # 1000, # ind_H_4    
+        # 1000, # ind_C_1
+        # 1000, # ind_C_2
+        # 1000, # ind_C_3
+        # 1000, # ind_C_4
+        # 1000, # ind_C_5
+        # 1000, # ind_C_6
+        # 1000, # ind_C_7
+        # 1000, # ind_N_1
+        # 1000, # ind_O_1
+        # 1000, # ind_Si_1
+        # ]
 
         train_data_loaders = fdm.prepare_train_data_loaders(
         total_samples_per_group=total_samples_per_group,
         high_force_samples_per_group=high_force_samples_per_group)
-
-        # hparams['train_indices'] = fdm.train_indices
 
 
         return train_data_loaders

@@ -532,7 +532,7 @@ def make_client(i, gpu_id_list):
             Hamiltonian_MaxAngularMomentum_C='p',
             Hamiltonian_MaxAngularMomentum_Si='d',
             kpts=(1,1,1),
-            # Hamiltonian_SCC='Yes',
+            Hamiltonian_SCC='Yes',
             # Verbosity=0,
             # Hamiltonian_OrbitalResolvedSCC = 'Yes',
             # Hamiltonian_SCCTolerance=1e-15,
