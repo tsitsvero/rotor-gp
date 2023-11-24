@@ -250,7 +250,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         return fdm
 
 
-def sample_data(fdm, N_samples):
+def sample_data(fdm, N_samples, N_high_force=0):
 
         import numpy as np
         # seed_everything(42, workers=True)
@@ -278,7 +278,7 @@ def sample_data(fdm, N_samples):
         N_samples, # ind_Si_1 
         ]
 
-        N_high_force = 0
+        N_high_force = N_high_force
 
         high_force_samples_per_group = [ N_high_force ] * 14
 
@@ -393,7 +393,7 @@ def test_performance(hparams, soap_params, AG_force_model, fdm):
         return
 
 
-def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
+def prepare_fande_ase_calc(hparams, soap_params, n_samples, gpu_id=0):
 
 
         import os
@@ -407,11 +407,11 @@ def prepare_fande_ase_calc(hparams, soap_params, gpu_id=0):
 
         fdm = prepare_data(hparams, soap_params, traj_sample_rate=1)
 
-        train_data_loaders = sample_data(fdm, N_samples=7_200)
+        train_data_loaders = sample_data(fdm, N_samples=n_samples, N_high_force=0)
 
         AG_force_model = prepare_model(fdm, train_data_loaders, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
 
-        test_performance(hparams, soap_params, AG_force_model, fdm) # check if working?
+        test_performance(hparams, soap_params, AG_force_model, fdm) 
 
         predictor = PredictorASE(
                     fdm,
