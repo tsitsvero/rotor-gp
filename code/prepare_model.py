@@ -140,7 +140,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         # traj_train = traj_300[100:500:5].copy() #traj_1800.copy() + traj_2100.copy()
         # traj_train = traj_dftb_2100[100:500].copy()
 
-        traj_train = traj_295_2000K[0:5000:10].copy()
+        traj_train = traj_295_2000K[0:5000:500].copy()
         # training_indices = np.sort(  np.arange(0, 500, 5) )  
         # traj_train = [traj_md[i] for i in training_indices]
         # print("Length of the train trajectory: ", len(traj_train))
@@ -158,7 +158,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
 
 
 
-        from fande.data import FandeDataModuleASE
+        from fande.data import FandeDataModule
 
         ## Train data:
         energies_train = np.zeros(len(traj_train) )
@@ -167,6 +167,7 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
                 energies_train[i] = snap.get_potential_energy()
                 forces_train[i] = snap.get_forces()
         train_data = {'trajectory': traj_train, 'energies': energies_train, 'forces': forces_train}
+        
         ## Test data:
         energies_test = np.zeros(len(traj_test) )
         forces_test = np.zeros( (len(traj_test), len(traj_test[0]), 3 ) )
@@ -176,16 +177,15 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
         test_data = {'trajectory': traj_test, 'energies': energies_test, 'forces': forces_test}
 
 
-        # atomic_groups = [ind_H_1, ind_H_2, ind_H_3, ind_H_4, ind_C_1, ind_C_2, ind_C_3, ind_C_4, ind_C_5, ind_C_6, ind_C_7, ind_N_1, ind_O_1, ind_Si_1] 
 
-
-        fdm = FandeDataModuleASE(train_data, test_data, hparams)
+        fdm = FandeDataModule(train_data, hparams)
         atomic_groups = find_atomic_groups(sample_snapshot)
         train_centers_positions = sum(atomic_groups, []) #list(range(len(atoms)))
         train_derivatives_positions = sum(atomic_groups, [])#list(range(len(atoms)))
         fdm.atomic_groups_sample_snapshot = sample_snapshot.copy()
         fdm.atomic_groups = atomic_groups
 
+        fdm.test_data = test_data
 
         # from ase.visualize import view
         # view(sample_snapshot)
@@ -198,6 +198,8 @@ def prepare_data(hparams, soap_params, traj_sample_rate=1):
                 same_centers_derivatives=True,
                 frames_per_batch=1,
                 calculation_context="train")
+
+
 
         fdm.calculate_invariants_librascal(
                 soap_params,
@@ -376,14 +378,16 @@ def prepare_model(fdm, train_data_loaders, hparams, soap_params, n_steps, learni
 
 def test_performance(hparams, soap_params, AG_force_model, fdm):
 
-        from fande.predict import PredictorASE
+        from fande.predict import FandePredictor
 
         AG_force_model.eval()
 
-        predictor = PredictorASE(
+        energy_model = None
+
+        predictor = FandePredictor(
                 fdm,
                 AG_force_model,
-                # trainer_f,
+                energy_model,
                 hparams,
                 soap_params
         )
@@ -393,7 +397,7 @@ def test_performance(hparams, soap_params, AG_force_model, fdm):
         return
 
 
-def prepare_fande_ase_calc(hparams, soap_params, n_samples, gpu_id=0):
+def prepare_fande_ase_calc(hparams, soap_params, n_samples, num_grad_steps, gpu_id=0):
 
 
         import os
@@ -401,7 +405,7 @@ def prepare_fande_ase_calc(hparams, soap_params, n_samples, gpu_id=0):
         import wandb
         wandb.init(project="rotor-gp", save_code=True, notes="hello", id=machine_name, mode='disabled')
 
-        from fande.predict import PredictorASE
+        from fande.predict import FandePredictor
         from fande.ase import FandeCalc
 
 
@@ -409,13 +413,16 @@ def prepare_fande_ase_calc(hparams, soap_params, n_samples, gpu_id=0):
 
         train_data_loaders = sample_data(fdm, N_samples=n_samples, N_high_force=0)
 
-        AG_force_model = prepare_model(fdm, train_data_loaders, hparams, soap_params, 200, 0.01, gpu_id=gpu_id)
+        AG_force_model = prepare_model(fdm, train_data_loaders, hparams, soap_params, num_grad_steps, 0.01, gpu_id=gpu_id)
 
         test_performance(hparams, soap_params, AG_force_model, fdm) 
 
-        predictor = PredictorASE(
+        energy_model = None
+
+        predictor = FandePredictor(
                     fdm,
                     AG_force_model,
+                    energy_model,
                     hparams,
                     soap_params
         )
