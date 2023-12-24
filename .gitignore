@@ -179,3 +179,5 @@ code/pimd/caclulation_temp/*
 *RESTART*
 
 code/pimd/ipi2ase.py
+
+code/test/
