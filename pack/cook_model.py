@@ -25,35 +25,56 @@ parser = argparse.ArgumentParser()
 # Add an argument
 parser.add_argument('--data_dir', type=str, required=True)
 parser.add_argument('--results_dir', type=str, required=True)
+
 parser.add_argument('--energy_model', type=str, required=True)
+parser.add_argument('--energy_num_inducing_points', type=int, required=True)
 parser.add_argument('--energy_lr', type=float, required=True)
 parser.add_argument('--energy_num_steps', type=int, required=True)
+
+
+
 parser.add_argument('--forces_model', type=str, required=True)
+parser.add_argument('--forces_num_inducing_points', type=int, required=True)
 parser.add_argument('--num_force_samples', type=int, required=True)
 parser.add_argument('--forces_lr', type=float, required=True)
 parser.add_argument('--forces_num_steps', type=int, required=True)
+
+parser.add_argument('--predictor_name', type=str, required=True)
+parser.add_argument('--subsample', type=int, required=False, default=200)
+
 
 # Parse the argument
 args = parser.parse_args()
 DATA_DIR = args.data_dir
 RESULTS_DIR = args.results_dir
 ENERGY_MODEL = args.energy_model
+ENERGY_NUM_INDUCING_POINTS = args.energy_num_inducing_points
 ENERGY_LR = args.energy_lr
 ENERGY_NUM_STEPS = args.energy_num_steps
+
 FORCES_MODEL = args.forces_model
+FORCES_NUM_INDUCING_POINTS = args.forces_num_inducing_points
 NUM_FORCE_SAMPLES = args.num_force_samples
 FORCES_LR = args.forces_lr
 FORCES_NUM_STEPS = args.forces_num_steps
 
+PREDICTOR_NAME = args.predictor_name
+# PREDICTOR_NAME = "fande_predictor_" + str(ENERGY_MODEL) + "_" + str(ENERGY_LR) + "_" + str(ENERGY_NUM_STEPS) + "_" + str(FORCES_MODEL) + "_" + str(NUM_FORCE_SAMPLES) + "_" + str(FORCES_LR) + "_" + str(FORCES_NUM_STEPS) + ".pth"
+
+SUBSAMPLE = args.subsample
+
 print("DATA_DIR", DATA_DIR)
 print("RESULTS_DIR", RESULTS_DIR)
 print("ENERGY_MODEL", ENERGY_MODEL)
+print("ENERGY_NUM_INDUCING_POINTS", ENERGY_NUM_INDUCING_POINTS)
 print("ENERGY_LR", ENERGY_LR)
 print("ENERGY_NUM_STEPS", ENERGY_NUM_STEPS)
 print("FORCES_MODEL", FORCES_MODEL)
+print("FORCES_NUM_INDUCING_POINTS", FORCES_NUM_INDUCING_POINTS)
 print("NUM_FORCE_SAMPLES", NUM_FORCE_SAMPLES)
 print("FORCES_LR", FORCES_LR)
 print("FORCES_NUM_STEPS", FORCES_NUM_STEPS)
+print("PREDICTOR_NAME", PREDICTOR_NAME)
 
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
@@ -76,14 +97,15 @@ traj_295_2000K = io.read(DATA_DIR+"/results_triasine_ML_2000/struct_295_2000K/md
 # traj_355_2000K_forced = io.read(DATA_DIR+"/results_triasine_ML_2000/struct_355_2000K_0075force/md_trajectory.traj", index=":")
 
 trajectory_forces = traj_295_2000K[0:5000:5]
-trajectory_forces = trajectory_forces[::20].copy()
-
+trajectory_forces = trajectory_forces[::SUBSAMPLE].copy()
 # trajectory_energy = traj_295[0:5000] + traj_355[0:5000] + traj_295_2000K[0:5000] + traj_355_2000K[0:5000] + traj_295_2000K_forced[0:5000] + traj_355_2000K_forced[0:5000]
 # trajectory_energy = traj_295 + traj_295_2000K + traj
 trajectory_energy = traj_295[0:5000:10] +  traj_295_2000K[0:5000:10]
-trajectory_energy = trajectory_energy[::20].copy()
-
+trajectory_energy = trajectory_energy[::SUBSAMPLE].copy()
 print(len(trajectory_forces), len(trajectory_energy))
+
+
+
 from fande.data import FandeDataModule
 from fande.utils.find_atomic_groups import find_atomic_groups
 
@@ -148,7 +170,7 @@ hparams = {
         'device' : 'cpu',
         'energy_model_hparams' : {
                 'model_type' : ENERGY_MODEL,#'variational_inducing_points', 'exact'
-                'num_inducing_points' : 10,
+                'num_inducing_points' : ENERGY_NUM_INDUCING_POINTS,
                 'num_epochs' : ENERGY_NUM_STEPS,
                 'learning_rate' : ENERGY_LR,
         }
@@ -182,7 +204,7 @@ for i in range(len(atomic_groups)):
         'soap_params' : soap_params,
         'forces_model_hparams' : {
                 'model_type' : FORCES_MODEL,#'variational_inducing_points', 'exact'
-                'num_inducing_points' : 10,
+                'num_inducing_points' : FORCES_NUM_INDUCING_POINTS,
         }
         }
         
@@ -228,7 +250,7 @@ from datetime import datetime
 now_str = str( datetime.now() )
 device = torch.device('cpu')
 fande_calc.predictor.move_models_to_device(device)
-fande_calc.save_predictor(RESULTS_DIR + "/fande_predictor_" + now_str + ".pth")
+fande_calc.save_predictor(RESULTS_DIR + "/" + PREDICTOR_NAME)
 # device = torch.device('cuda:0') # always specify the gpu id!
 device = torch.device('cpu')
 fande_calc.predictor.move_models_to_device(device)
