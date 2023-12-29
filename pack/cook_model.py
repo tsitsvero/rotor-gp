@@ -1,23 +1,4 @@
 import os
-DATA_DIR = os.path.expanduser("~/repos/data/")
-# DATA_DIR = "/data1/simulations/datasets/rotors/high_temp_ML_training_data/"
-RESULTS_DIR = os.path.expanduser("~/repos/data/results")
-
-# DATA_DIR = os.path.expanduser("/content/drive/MyDrive/data/")
-# # FANDE_DIR = os.path.expanduser("~/")
-# RESULTS_DIR = os.path.expanduser("~/results")
-# os.makedirs(RESULTS_DIR, exist_ok=True)
-
-ENERGY_MODEL = 'variational_inducing_points' #'variational_inducing_points', 'exact'
-ENERGY_LR = 0.01
-ENERGY_NUM_STEPS = 5
-
-FORCES_MODEL = 'variational_inducing_points' #'variational_inducing_points', 'exact'
-NUM_FORCE_SAMPLES = 10
-FORCES_LR = 0.01
-FORCES_NUM_STEPS = 5
-
-
 
 import argparse
 # Create the parser
@@ -30,7 +11,6 @@ parser.add_argument('--energy_model', type=str, required=True)
 parser.add_argument('--energy_num_inducing_points', type=int, required=True)
 parser.add_argument('--energy_lr', type=float, required=True)
 parser.add_argument('--energy_num_steps', type=int, required=True)
-
 
 
 parser.add_argument('--forces_model', type=str, required=True)
@@ -81,7 +61,6 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 FANDE_DIR = os.path.expanduser("~/repos/")
 
 ############################################################################################################
-import os
 import sys
 import torch
 sys.path.append(FANDE_DIR + "fande/")
@@ -89,21 +68,17 @@ sys.path.append(FANDE_DIR + "fande/")
 from ase import io
 
 
-traj_295 = io.read(DATA_DIR+"/results_triasine_ML_2000/struct_295_295K/md_trajectory.traj", index=":")
-# traj_355 = io.read(DATA_DIR+"/results_triasine_ML_2000/struct_355_355K/md_trajectory.traj", index=":")
-traj_295_2000K = io.read(DATA_DIR+"/results_triasine_ML_2000/struct_295_2000K/md_trajectory.traj", index=":")
-# traj_355_2000K = io.read(DATA_DIR+"/results_triasine_ML_2000/struct_355_2000K/md_trajectory.traj", index=":")
-# traj_295_2000K_forced = io.read(DATA_DIR+"/results_triasine_ML_2000/struct_295_2000K_0075force/md_trajectory.traj", index=":")
-# traj_355_2000K_forced = io.read(DATA_DIR+"/results_triasine_ML_2000/struct_355_2000K_0075force/md_trajectory.traj", index=":")
-
-trajectory_forces = traj_295_2000K[0:5000:5]
+trajectory_forces = io.read(DATA_DIR + "/train_forces.traj", index=":")
 trajectory_forces = trajectory_forces[::SUBSAMPLE].copy()
-# trajectory_energy = traj_295[0:5000] + traj_355[0:5000] + traj_295_2000K[0:5000] + traj_355_2000K[0:5000] + traj_295_2000K_forced[0:5000] + traj_355_2000K_forced[0:5000]
-# trajectory_energy = traj_295 + traj_295_2000K + traj
-trajectory_energy = traj_295[0:5000:10] +  traj_295_2000K[0:5000:10]
+
+trajectory_energy = io.read(DATA_DIR + "/train_energy.traj", index=":")
 trajectory_energy = trajectory_energy[::SUBSAMPLE].copy()
 print(len(trajectory_forces), len(trajectory_energy))
 
+
+
+validation_trajectory_forces = io.read(DATA_DIR + "/validation_forces.traj", index=":")
+validation_energy = io.read(DATA_DIR + "/validation_energy.traj", index=":")
 
 
 from fande.data import FandeDataModule
@@ -188,7 +163,6 @@ print("Energy model fitted")
 
 from fande.models import ModelForces, GroupModelForces
 
-
 n_steps_list = [FORCES_NUM_STEPS] * len(atomic_groups)
 lr_list = [FORCES_LR] * len(atomic_groups)
 
@@ -256,8 +230,7 @@ device = torch.device('cpu')
 fande_calc.predictor.move_models_to_device(device)
 from ase import io
 from tqdm import tqdm
-test_traj = io.read(DATA_DIR + "/results_triasine_ML_2000/struct_295_295K/md_trajectory.traj", index="1235:1240")
-test_traj = test_traj.copy()
+test_traj = validation_trajectory_forces.copy()
 
 real_energies = [s.get_potential_energy() for s in test_traj]
 predicted_energies = []
