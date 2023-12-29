@@ -1,9 +1,7 @@
 import os
 DATA_DIR = os.path.expanduser("~/repos/data/")
 # DATA_DIR = "/data1/simulations/datasets/rotors/high_temp_ML_training_data/"
-FANDE_DIR = os.path.expanduser("~/repos/")
 RESULTS_DIR = os.path.expanduser("~/repos/data/results")
-os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # DATA_DIR = os.path.expanduser("/content/drive/MyDrive/data/")
 # # FANDE_DIR = os.path.expanduser("~/")
@@ -20,6 +18,48 @@ FORCES_LR = 0.01
 FORCES_NUM_STEPS = 5
 
 
+
+import argparse
+# Create the parser
+parser = argparse.ArgumentParser()
+# Add an argument
+parser.add_argument('--data_dir', type=str, required=True)
+parser.add_argument('--results_dir', type=str, required=True)
+parser.add_argument('--energy_model', type=str, required=True)
+parser.add_argument('--energy_lr', type=float, required=True)
+parser.add_argument('--energy_num_steps', type=int, required=True)
+parser.add_argument('--forces_model', type=str, required=True)
+parser.add_argument('--num_force_samples', type=int, required=True)
+parser.add_argument('--forces_lr', type=float, required=True)
+parser.add_argument('--forces_num_steps', type=int, required=True)
+
+# Parse the argument
+args = parser.parse_args()
+DATA_DIR = args.data_dir
+RESULTS_DIR = args.results_dir
+ENERGY_MODEL = args.energy_model
+ENERGY_LR = args.energy_lr
+ENERGY_NUM_STEPS = args.energy_num_steps
+FORCES_MODEL = args.forces_model
+NUM_FORCE_SAMPLES = args.num_force_samples
+FORCES_LR = args.forces_lr
+FORCES_NUM_STEPS = args.forces_num_steps
+
+print("DATA_DIR", DATA_DIR)
+print("RESULTS_DIR", RESULTS_DIR)
+print("ENERGY_MODEL", ENERGY_MODEL)
+print("ENERGY_LR", ENERGY_LR)
+print("ENERGY_NUM_STEPS", ENERGY_NUM_STEPS)
+print("FORCES_MODEL", FORCES_MODEL)
+print("NUM_FORCE_SAMPLES", NUM_FORCE_SAMPLES)
+print("FORCES_LR", FORCES_LR)
+print("FORCES_NUM_STEPS", FORCES_NUM_STEPS)
+
+os.makedirs(RESULTS_DIR, exist_ok=True)
+
+FANDE_DIR = os.path.expanduser("~/repos/")
+
+############################################################################################################
 import os
 import sys
 import torch
