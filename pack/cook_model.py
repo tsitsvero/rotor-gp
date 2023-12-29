@@ -68,16 +68,17 @@ sys.path.append(FANDE_DIR + "fande/")
 from ase import io
 
 
-trajectory_forces = io.read(DATA_DIR + "/train_forces.traj", index=":")
-trajectory_forces = trajectory_forces[::SUBSAMPLE].copy()
+train_energy = io.read(DATA_DIR + "/train_energy.traj", index=":")
+train_energy = train_energy[::SUBSAMPLE].copy()
 
-trajectory_energy = io.read(DATA_DIR + "/train_energy.traj", index=":")
-trajectory_energy = trajectory_energy[::SUBSAMPLE].copy()
-print(len(trajectory_forces), len(trajectory_energy))
+train_forces = io.read(DATA_DIR + "/train_forces.traj", index=":")
+train_forces = train_forces[::SUBSAMPLE].copy()
+
+print(len(train_forces), len(train_energy))
 
 
 
-validation_trajectory_forces = io.read(DATA_DIR + "/validation_forces.traj", index=":")
+validation_forces = io.read(DATA_DIR + "/validation_forces.traj", index=":")
 validation_energy = io.read(DATA_DIR + "/validation_energy.traj", index=":")
 
 
@@ -112,7 +113,7 @@ soap_params = dict(soap_type="PowerSpectrum",
         )
 ##FOR NOW USE THE SAME SOAP PARAMETERS FOR ENERGY AND FORCES! (that makes sense if you're modeling the MD)
 
-sample_snapshot = trajectory_forces[0].copy()
+sample_snapshot = train_forces[0].copy()
 fdm = FandeDataModule()
 atomic_groups = find_atomic_groups(sample_snapshot)
 train_centers_positions = sum(atomic_groups, []) #list(range(len(atoms)))
@@ -122,9 +123,12 @@ fdm.atomic_groups = atomic_groups
 
 total_forces_samples_per_group = [NUM_FORCE_SAMPLES] * len(atomic_groups)
 high_forces_samples_per_group = [0] * len(atomic_groups)
+
+
+print("Preparing dataloaders...")
 dataloader_energy, dataloaders_forces = fdm.dataloaders_from_trajectory(
-                                                                trajectory_energy,
-                                                                trajectory_forces,
+                                                                train_energy,
+                                                                train_forces,
                                                                 # energies = None,
                                                                 # forces = None,
                                                                 atomic_groups = atomic_groups,
@@ -136,6 +140,8 @@ dataloader_energy, dataloaders_forces = fdm.dataloaders_from_trajectory(
                                                                 high_force_samples_per_group = high_forces_samples_per_group,
                                                                 )
 # Making energy model
+
+print("Dataloaders ready")
 
 from fande.models import EnergyModel
 
@@ -230,7 +236,7 @@ device = torch.device('cpu')
 fande_calc.predictor.move_models_to_device(device)
 from ase import io
 from tqdm import tqdm
-test_traj = validation_trajectory_forces.copy()
+test_traj = validation_forces.copy()
 
 real_energies = [s.get_potential_energy() for s in test_traj]
 predicted_energies = []
