@@ -181,3 +181,6 @@ code/pimd/caclulation_temp/*
 code/pimd/ipi2ase.py
 
 code/test/
+hparams.yaml
+
+*.ckpt
